@@ -1,0 +1,8 @@
+client/node_modules
+.idea
+backend/__pycache__
+backend/api/__pycache__
+db
+volumes
+.DS_Store
+.env
