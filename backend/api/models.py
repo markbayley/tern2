@@ -53,6 +53,7 @@ class SearchFilter(db.Model):
     def search(self):
         query = []
         size = 0
+        aggregation = "metadata_doc.plot.keyword"
         if self.node_id:
             query.append({
                 "query_string": {

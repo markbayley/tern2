@@ -62,7 +62,7 @@ class SearchResult(Resource):
         for result in res:
             item = {}
             search_result.append(item)
-        return jsonify(res)
+        return jsonify(res['aggregations'])
 
     def post(self):
         args = self.reqparse.parse_args()
