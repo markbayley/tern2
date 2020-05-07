@@ -3,14 +3,17 @@ import logo from './logo.svg';
 import './App.css';
 import { CONFIG } from './config.js';
 
+const base_image_url = 'https://swift.rc.nectar.org.au/v1/AUTH_05bca33fce34447ba7033b9305947f11/bioimages/';
+
 function SearchResults(props) {
   return (
     <div>
       <div className="">
         <ul>
-          {props.value.map((result) => (
+          {props.value.map((result, index) => (
             <SearchResult
-              value={result} />
+              value={result}
+              key={index} />
           ))
           }
         </ul>
@@ -20,13 +23,18 @@ function SearchResults(props) {
 
 }
 function SearchResult(props) {
+  const img_url = base_image_url + props.value.top_tags_hits.hits.hits[0]._source.published_paths[3];
   return (
-    <li key="{props.value.key}">{props.value.top_tags_hits.hits.hits[0]._id}</li>
+    <li id={props.key}>
+      {props.value.top_tags_hits.hits.hits[0]._id}
+      <img src={img_url} />
+    </li>
   );
 
 }
-function ImageSearch(props) {
 
+
+function ImageSearch(props) {
   return (
     <div>
       <div className="">
@@ -37,14 +45,11 @@ function ImageSearch(props) {
               {Object.keys(props.value[key].buckets).map((key1) => (
                 <ImageFilter
                   value={props.value[key].buckets[key1].key}
-                  key={key} />
+                  key={key1} />
               ))}
             </ul>
           </div>
         ))}
-      </div>
-      <div>
-
       </div>
     </div>
   );
