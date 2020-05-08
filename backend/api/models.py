@@ -92,7 +92,7 @@ class SearchFilter(db.Model):
         if self.site_visit_id:
             size = 20
             aggregation = ""
-            return query
+            #return query
 
         if self.search_string:
             query.append({

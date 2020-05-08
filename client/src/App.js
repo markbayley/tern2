@@ -3,17 +3,18 @@ import logo from './logo.svg';
 import './App.css';
 import { CONFIG } from './config.js';
 
-const base_image_url = 'https://swift.rc.nectar.org.au/v1/AUTH_05bca33fce34447ba7033b9305947f11/bioimages/';
+const base_image_url = 'https://swift.rc.nectar.org.au/v1/AUTH_05bca33fce34447ba7033b9305947f11/';
 
 function SearchResults(props) {
   return (
     <div>
-      <div className="">
+      <div className="right">
         <ul>
-          {props.value.map((result, index) => (
+          {Object.keys(props.value).map((index, value) => (
             <SearchResult
-              value={result}
-              key={index} />
+              value={props.value[index]}
+              id={index}
+              key={index + value} />
           ))
           }
         </ul>
@@ -23,14 +24,13 @@ function SearchResults(props) {
 
 }
 function SearchResult(props) {
-  const img_url = base_image_url + props.value.top_tags_hits.hits.hits[0]._source.published_paths[3];
+  const img_url = base_image_url + props.value.published_root + '/' + props.value.thumbnail_path;
   return (
-    <li id={props.key}>
-      {props.value.top_tags_hits.hits.hits[0]._id}
-      <img src={img_url} />
+    <li id={props.id}>
+      <img src={img_url} /><br />
+      <span className="space-left">key:{props.id} - id:{props.value._id} - node:{props.value.metadata_doc.supersite_node_code} - img:{props.value.metadata_doc.image_type}</span>
     </li>
   );
-
 }
 
 
@@ -38,28 +38,43 @@ function ImageSearch(props) {
   return (
     <div>
       <div className="">
-        {Object.keys(props.value).map((key) => (
-          <div className="container">
-            <span className="left">{key}</span>
-            <ul>
-              {Object.keys(props.value[key].buckets).map((key1) => (
-                <ImageFilter
-                  value={props.value[key].buckets[key1].key}
-                  key={key1} />
-              ))}
-            </ul>
-          </div>
+        {Object.keys(props.value).map((key, indexer) => (
+          <ImageFilterType
+            value={props.value[key]}
+            header={key}
+            key={key}
+            onClick={(i) => props.onClick(i)} />
         ))}
       </div>
     </div>
   );
 }
 
+function ImageFilterType(props) {
+      return (
+      <div className="container"  key="{key}">
+        <span className="">{props.header}</span>
+        <ul>
+          {Object.keys(props.value).map((key1) => (
+            <ImageFilter
+              value={props.value[key1].key}
+              key={props.header+ '--' +props.value[key1].key}
+              onClick={() => props.onClick(props.header+ '--' +props.value[key1].key)} />
+          ))}
+        </ul>
+      </div>
+      );
+}
+
 function ImageFilter(props) {
   return (
     <div>
       <div className="">
-        <li key="{key}">{props.value}</li>
+        <li key="{key}">
+          <a href="#" 
+                onClick={props.onClick}>
+                {props.value}</a>
+                </li>
       </div>
     </div>
   );
@@ -70,7 +85,7 @@ function Favourite(props) {
     <li key="{index}">{props.value.user_id} {props.value.favourite_name}</li>
   );
 }
-class App extends Component {
+class App extends React.Component {
 
   constructor() {
     super();
@@ -81,6 +96,7 @@ class App extends Component {
       images: null,
       error: null,
       isLoading: true,
+      isLoadingSearch: true,
       search: {},
     };
   }
@@ -110,7 +126,9 @@ class App extends Component {
       .then(data =>
         this.setState({
           search: data,
-          isLoading: false,
+          hits: data['hits'],
+          filters: data['aggregations'],
+          isLoadingSearch: false,
         })
       )
       // Catch any errors we hit and update the app
@@ -123,6 +141,13 @@ class App extends Component {
     this.fetchSearch()
   }
 
+  handleFilter(i) {
+    const filter = this.state.filters;
+
+    console.log(i.type);
+    alert(i);  //image_type--photopoint
+}
+
 
   render() {
     const { isLoading, favourites, filters, search, hits, error } = this.state;
@@ -130,43 +155,32 @@ class App extends Component {
       return (
         <Favourite
           value={favourite}
-          index={index} />
+          index={index}
+          key={'f'+index} />
       );
     });
-
-    var currentHits = [];
-
-    Object.keys(search).forEach(filter => {
-      if (filter == 'top_sites') {
-        Object.keys(search[filter].buckets).forEach(entry => {
-          if (!search[filter].buckets[entry].key.startsWith('.')) {
-            currentHits.push(search[filter].buckets[entry]);
-            //this.state.hits[] = search[filter].buckets[entry];
-          }
-        })
-        //this.state.hits = search[filter];
-      } else {
-        filters[filter] = search[filter]
-      }
-    });
-    this.state.hits = currentHits;
 
     return (
       <div>
 
-        <h1>Favourites list</h1>
+        <h3>Favourites list</h3>
         <ul>
           {favs}
         </ul>
-        <h1>Filter</h1>
+        <div className="left">
+        <h3>Filter</h3>
         <div>
           <ImageSearch
-            value={this.state.filters} />
+            value={this.state.filters}
+            onClick={(i) => this.handleFilter(i)} />
         </div>
-        <h1>Search</h1>
+        </div>
+        <div className="right">
+        <h3>Search</h3>
         <div>
           <SearchResults
             value={this.state.hits} />
+        </div>
         </div>
       </div>
     );

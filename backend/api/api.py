@@ -58,11 +58,20 @@ class SearchResult(Resource):
         # return((this_filter.search()))
         # return "hi"
         res = es.search(index=self.index_name, body=(this_filter.search()))
-        search_result = []
-        for result in res:
-            item = {}
-            search_result.append(item)
-        return jsonify(res['aggregations'])
+        search_result = {'aggregations': {}, 'hits': {}}
+        for key, result in res['aggregations'].items():
+            if (key == 'top_sites'):
+                for entry in result['buckets']:
+                    if entry['key'].startswith('.'):
+                        continue
+                    search_result['hits'][entry['key']] = entry['top_tags_hits']['hits']['hits'][0]['_source']
+                    search_result['hits'][entry['key']]['thumbnail_path'] = [s for s in search_result['hits'][entry['key']]['published_paths'] if "/320_" in s][0]
+                    search_result['hits'][entry['key']]['doc_count'] = entry['doc_count']
+                    search_result['hits'][entry['key']]['name'] = entry['top_tags_hits']['hits']['hits'][0]['_source']['metadata_doc']['supersite_node_code']
+            else:
+                search_result['aggregations'][key]=(result['buckets'])
+
+        return jsonify(search_result)
 
     def post(self):
         args = self.reqparse.parse_args()
