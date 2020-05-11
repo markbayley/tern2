@@ -28,7 +28,7 @@ function SearchResult(props) {
   return (
     <li id={props.id}>
       <img src={img_url} /><br />
-      <span className="space-left"><button onClick={() => props.onClick(props.id)}>key:{props.id} - count: {props.value.doc_count }- id:{props.value._id} - node:{props.value.metadata_doc.supersite_node_code} - img:{props.value.metadata_doc.image_type}</button></span>
+      <span className="space-left"><button onClick={() => props.onClick(props.id)}>key:{props.id} - count: {props.value.doc_count}- id:{props.value._id} - node:{props.value.metadata_doc.supersite_node_code} - img:{props.value.metadata_doc.image_type}</button></span>
     </li>
   );
 }
@@ -51,21 +51,21 @@ function ImageSearch(props) {
 }
 
 function ImageFilterType(props) {
-      return (
-      <div className="container"  key="{key}">
-        <span className="">
-          <button  onClick={() => props.onClick(props.header+ '=')}>
+  return (
+    <div className="container" key="{key}">
+      <span className="">
+        <button onClick={() => props.onClick(props.header + '=')}>
           {props.header}</button></span>
-        <ul>
-          {Object.keys(props.value).map((key1) => (
-            <ImageFilter
-              value={props.value[key1]}
-              key={props.header+ '=' +props.value[key1].key}
-              onClick={() => props.onClick(props.header+ '=' +props.value[key1].key)} />
-          ))}
-        </ul>
-      </div>
-      );
+      <ul>
+        {Object.keys(props.value).map((key1) => (
+          <ImageFilter
+            value={props.value[key1]}
+            key={props.header + '=' + props.value[key1].key}
+            onClick={() => props.onClick(props.header + '=' + props.value[key1].key)} />
+        ))}
+      </ul>
+    </div>
+  );
 }
 
 function ImageFilter(props) {
@@ -74,8 +74,8 @@ function ImageFilter(props) {
       <div className="">
         <li key="{key}">
           <button onClick={props.onClick}>
-                {props.value.key} ({props.value.doc_count})</button>
-                </li>
+            {props.value.key} ({props.value.doc_count})</button>
+        </li>
       </div>
     </div>
   );
@@ -84,7 +84,7 @@ function ImageFilter(props) {
 function Favourite(props) {
   return (
     <li key="{index}"> <button
-    onClick={props.onClick}>{props.value.user_id} {props.value.favourite_name}</button></li>
+      onClick={props.onClick}>{props.value.user_id} {props.value.favourite_name}</button></li>
   );
 }
 class App extends React.Component {
@@ -159,31 +159,34 @@ class App extends React.Component {
     console.log(i);
     var arr = i.split('=');
     selectedFilter[arr[0]] = arr[1];
+    if (arr[0] !== '_id') {
+      selectedFilter['_id'] = "";
+    }
     this.state.selectedFilter = selectedFilter;
     console.log(i);
     this.fetchSearch();
     console.log(this.state.isLoadingSearch);
     //console.log(args[0]);
     //alert(i);  //image_type=photopoint
-}
+  }
 
-handleFavourite(i) {
-  const favourites = this.state.favourites;
+  handleFavourite(i) {
+    const favourites = this.state.favourites;
 
-  console.log(i);
-  //console.log(args[0]);
-  alert(i);  //image_type=photopoint
-}
+    console.log(i);
+    //console.log(args[0]);
+    alert(i);  //image_type=photopoint
+  }
 
 
   render() {
-    const {favourites} = this.state;
+    const { favourites } = this.state;
     const favs = favourites.map((favourite, index) => {
       return (
         <Favourite
           value={favourite}
           index={index}
-          key={'f'+index}
+          key={'f' + index}
           onClick={() => this.handleFavourite(favourite.favourite_name)} />
       );
     });
@@ -191,26 +194,26 @@ handleFavourite(i) {
     return (
       <div>
 
-<div className="left">
-       <h3>Favourites list</h3>
-        <ul>
-          {favs}
-        </ul>
-        <h3>Filter</h3>
-        <div>
-          <ImageSearch
-            value={this.state.filters}
-            onClick={(i) => this.handleFilter(i)} />
-        </div>
+        <div className="left">
+          <h3>Favourites list</h3>
+          <ul>
+            {favs}
+          </ul>
+          <h3>Filter</h3>
+          <div>
+            <ImageSearch
+              value={this.state.filters}
+              onClick={(i) => this.handleFilter(i)} />
+          </div>
         </div>
         <div className="right">
-        <h3>Search</h3>
-        <div>
-          <SearchResults
-            value={this.state.hits}
-            group={this.state.aggregation}
-            onClick={(i) => this.handleFilter(i)} />
-        </div>
+          <h3>Search</h3>
+          <div>
+            <SearchResults
+              value={this.state.hits}
+              group={this.state.aggregation}
+              onClick={(i) => this.handleFilter(i)} />
+          </div>
         </div>
       </div>
     );

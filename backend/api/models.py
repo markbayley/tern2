@@ -46,6 +46,7 @@ class SearchFilter(db.Model):
     date_from = db.Column(db.DateTime, index=False,
                           unique=False, nullable=True)
     date_to = db.Column(db.DateTime, index=False, unique=False, nullable=True)
+    image_id = None
 
     def __repr__(self):
         return '<SearchFilter %r>' % self.supersite_node_code + ' ' + self.search_filter_id
@@ -53,19 +54,19 @@ class SearchFilter(db.Model):
     def search(self):
         query = []
         query.append({
-                "terms": {
-                    "source_extension":  ['nef', 'cr2', 'jpeg', 'jpg', 'arw'],
-                }
-            })
+            "terms": {
+                "source_extension":  ['nef', 'cr2', 'jpeg', 'jpg', 'arw'],
+            }
+        })
         size = 0
         aggregation = "metadata_doc.supersite_node_code.keyword"
         next_filter = 'supersite_node_code'
         if self.supersite_node_code:
             query.append({
-                 "term": {
-                     "metadata_doc.supersite_node_code":  self.supersite_node_code
-                 }
-             })
+                "term": {
+                    "metadata_doc.supersite_node_code":  self.supersite_node_code
+                }
+            })
             aggregation = "metadata_doc.image_type.keyword"
             next_filter = 'image_type'
 
@@ -101,7 +102,7 @@ class SearchFilter(db.Model):
 
         if self.site_visit_id:
             aggregation = "_id"
-            #return query
+            # return query
 
         if self.search_string:
             query.append({
@@ -110,8 +111,15 @@ class SearchFilter(db.Model):
                 }
             })
 
+        if self.image_id:
+            query.append({
+                "term": {
+                    "_id":  self.image_id
+                }
+            })
+
         if aggregation == '_id':
-            size=20
+            size = 20
 
         return {"aggregation": next_filter, "_search": {
             "size": size,
@@ -122,7 +130,7 @@ class SearchFilter(db.Model):
                     "terms": {
                         "field": aggregation,
                         "order": {"top_hit": "desc"},
-                        "size":"20",
+                        "size": "20",
                     },
                     "aggs": {
                         "top_tags_hits": {
@@ -153,28 +161,28 @@ class SearchFilter(db.Model):
                     }
                 },
                 "supersite_node_code": {
-                    #"filter": {"bool": {"filter": query}},
-                        "terms": {
-                            "field": "metadata_doc.supersite_node_code.keyword",
-                            "min_doc_count": 1,
-                            "order" : { "_key" : "asc" },
-                            "size":20
-                        }
+                    # "filter": {"bool": {"filter": query}},
+                    "terms": {
+                        "field": "metadata_doc.supersite_node_code.keyword",
+                        "min_doc_count": 1,
+                        "order": {"_key": "asc"},
+                        "size": 20
+                    }
                 },
                 "image_type": {
-                        "terms": {
-                            "field": "metadata_doc.image_type.keyword",
-                            "min_doc_count": 1,
-                            "order" : { "_key" : "asc" }
-                        }
+                    "terms": {
+                        "field": "metadata_doc.image_type.keyword",
+                        "min_doc_count": 1,
+                        "order": {"_key": "asc"}
+                    }
                 },
                 "plot": {
-                        "terms": {
-                            "field": "metadata_doc.plot.keyword",
-                            "min_doc_count": 1,
-                            "order" : { "_key" : "asc" },
-                            "size": 150
-                        }
+                    "terms": {
+                        "field": "metadata_doc.plot.keyword",
+                        "min_doc_count": 1,
+                        "order": {"_key": "asc"},
+                        "size": 150
+                    }
                 }
             }
         }

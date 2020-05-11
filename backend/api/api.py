@@ -38,6 +38,7 @@ class SearchResult(Resource):
     def get(self):
         args = request.args
         this_filter = SearchFilterModel()
+        thumb_size = "/320_"
         if 'supersite_node_code' in args:
             this_filter.supersite_node_code = args['supersite_node_code']
         if 'plot' in args:
@@ -54,6 +55,11 @@ class SearchResult(Resource):
             this_filter.date_from = args['date_from']
         if 'date_to' in args:
             this_filter.date_to = args['date_to']
+        if '_id' in args:
+            this_filter.image_id = args['_id']
+            if args['_id'] != '':
+                thumb_size = "/640_"
+
         #res = es.get(index="bioimages", id='Shared/tern.data/bioimages/boya_bioimages/lai/core1ha/20180222/DSC00157_N6.JPG')
 
         # return((this_filter.search()))
@@ -68,7 +74,7 @@ class SearchResult(Resource):
                     if entry['key'].startswith('.'):
                         continue
                     search_result['hits'][entry['key']] = entry['top_tags_hits']['hits']['hits'][0]['_source']
-                    search_result['hits'][entry['key']]['thumbnail_path'] = [s for s in search_result['hits'][entry['key']]['published_paths'] if "/320_" in s][0]
+                    search_result['hits'][entry['key']]['thumbnail_path'] = [s for s in search_result['hits'][entry['key']]['published_paths'] if thumb_size in s][0]
                     search_result['hits'][entry['key']]['doc_count'] = entry['doc_count']
                     search_result['hits'][entry['key']]['name'] = entry['top_tags_hits']['hits']['hits'][0]['_source']['metadata_doc']['supersite_node_code']
             else:
