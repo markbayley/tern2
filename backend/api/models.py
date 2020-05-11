@@ -37,8 +37,8 @@ class SearchFilter(db.Model):
     __tablename__ = "search_filter"
     search_filter_id = db.Column(db.Integer, db.Sequence(
         'search_filter_id_seq', metadata=db.Model.metadata), primary_key=True)
-    node_id = db.Column(db.Integer, nullable=True)
-    plot_id = db.Column(db.Integer, nullable=True)
+    supersite_node_code = db.Column(db.Integer, nullable=True)
+    plot = db.Column(db.Integer, nullable=True)
     site_visit_id = db.Column(db.Integer, nullable=True)
     spatial_search = db.Column(db.String(50), nullable=True)
     image_type = db.Column(db.String(12), nullable=True)
@@ -48,50 +48,59 @@ class SearchFilter(db.Model):
     date_to = db.Column(db.DateTime, index=False, unique=False, nullable=True)
 
     def __repr__(self):
-        return '<SearchFilter %r>' % self.node_id + ' ' + self.search_filter_id
+        return '<SearchFilter %r>' % self.supersite_node_code + ' ' + self.search_filter_id
 
     def search(self):
         query = []
-        size = 0
-        aggregation = "metadata_doc.plot.keyword"
-        if self.node_id:
-            query.append({
-                "query_string": {
-                    "query":  self.node_id,
-                    "fields": ["metadata_doc.supersite_node_code"]
+        query.append({
+                "terms": {
+                    "source_extension":  ['nef', 'cr2', 'jpeg', 'jpg', 'arw'],
                 }
             })
+        size = 0
+        aggregation = "metadata_doc.supersite_node_code.keyword"
+        next_filter = 'supersite_node_code'
+        if self.supersite_node_code:
+            query.append({
+                 "term": {
+                     "metadata_doc.supersite_node_code":  self.supersite_node_code
+                 }
+             })
             aggregation = "metadata_doc.image_type.keyword"
+            next_filter = 'image_type'
 
         if self.image_type:
             query.append({
-                "query_string": {
-                    "query":  self.image_type,
-                    "fields": ["metadata_doc.image_type"]
+                "term": {
+                    "metadata_doc.image_type":  self.image_type
                 }
             })
             aggregation = "metadata_doc.plot.keyword"
-            if not self.node_id:
+            next_filter = 'plot'
+            if not self.supersite_node_code:
                 aggregation = "metadata_doc.supersite_node_code.keyword"
+                next_filter = 'supersite_node_code'
 
-        if self.plot_id:
+        if self.plot:
             query.append({
-                "query_string": {
-                    "query":  self.plot_id,
-                    "fields": ["metadata_doc.plot"]
+                "term": {
+                    "metadata_doc.plot": self.plot
                 }
             })
-            aggregation = "metadata_doc.collection_date.keyword"
-            aggregation = ""
-            if not self.node_id:
+            next_filter = '_id'
+
+            #aggregation = "metadata_doc.collection_date.keyword"
+            aggregation = "_id"
+            if not self.supersite_node_code:
                 aggregation = "metadata_doc.supersite_node_code.keyword"
+                next_filter = 'supersite_node_code'
             else:
                 if not self.image_type:
                     aggregation = "metadata_doc.image_type.keyword"
+                    next_filter = 'image_type'
 
         if self.site_visit_id:
-            size = 20
-            aggregation = ""
+            aggregation = "_id"
             #return query
 
         if self.search_string:
@@ -101,21 +110,26 @@ class SearchFilter(db.Model):
                 }
             })
 
-        return {"size": size, "query": {"bool": {"must": query}
-                                        },
-                "aggs": {
+        if aggregation == '_id':
+            size=20
+
+        return {"aggregation": next_filter, "_search": {
+            "size": size,
+            "query": {
+                "bool": {"filter": query}},
+            "aggs": {
                 "top_sites": {
                     "terms": {
-                        "field": aggregation,  # dependent on the applied filters
-                        "order": {
-                            "top_hit": "desc"
-                        }
+                        "field": aggregation,
+                        "order": {"top_hit": "desc"},
+                        "size":"20",
                     },
                     "aggs": {
                         "top_tags_hits": {
                             "top_hits": {
                                 "_source": {
                                     "includes": [
+                                        "published_basename",
                                         "id",
                                         "metadata_doc.supersite_node_code",
                                         "metadata_doc.plot",
@@ -138,29 +152,30 @@ class SearchFilter(db.Model):
                         }
                     }
                 },
-            "supersite_node_code": {
-                    "terms": {
-                        "field": "metadata_doc.supersite_node_code.keyword",
-                        "min_doc_count": 1
-                    }
-            },
-            "image_type": {
-                    "terms": {
-                        "field": "metadata_doc.image_type.keyword",
-                        "min_doc_count": 1
-                    }
-            },
-            "plot": {
-                    "terms": {
-                        "field": "metadata_doc.plot.keyword",
-                        "min_doc_count": 1
-                    }
-            },
-            "supersite_node_code": {
-                    "terms": {
-                        "field": "metadata_doc.supersite_node_code.keyword",
-                        "min_doc_count": 1
-                    }
+                "supersite_node_code": {
+                    #"filter": {"bool": {"filter": query}},
+                        "terms": {
+                            "field": "metadata_doc.supersite_node_code.keyword",
+                            "min_doc_count": 1,
+                            "order" : { "_key" : "asc" },
+                            "size":20
+                        }
+                },
+                "image_type": {
+                        "terms": {
+                            "field": "metadata_doc.image_type.keyword",
+                            "min_doc_count": 1,
+                            "order" : { "_key" : "asc" }
+                        }
+                },
+                "plot": {
+                        "terms": {
+                            "field": "metadata_doc.plot.keyword",
+                            "min_doc_count": 1,
+                            "order" : { "_key" : "asc" },
+                            "size": 150
+                        }
+                }
             }
         }
         }

@@ -1,5 +1,4 @@
-import React, { Component } from 'react';
-import logo from './logo.svg';
+import React from 'react';
 import './App.css';
 import { CONFIG } from './config.js';
 
@@ -13,8 +12,9 @@ function SearchResults(props) {
           {Object.keys(props.value).map((index, value) => (
             <SearchResult
               value={props.value[index]}
-              id={index}
-              key={index + value} />
+              id={props.group + '=' + index}
+              key={index + value}
+              onClick={(i) => props.onClick(i)} />
           ))
           }
         </ul>
@@ -28,7 +28,7 @@ function SearchResult(props) {
   return (
     <li id={props.id}>
       <img src={img_url} /><br />
-      <span className="space-left">key:{props.id} - id:{props.value._id} - node:{props.value.metadata_doc.supersite_node_code} - img:{props.value.metadata_doc.image_type}</span>
+      <span className="space-left"><button onClick={() => props.onClick(props.id)}>key:{props.id} - count: {props.value.doc_count }- id:{props.value._id} - node:{props.value.metadata_doc.supersite_node_code} - img:{props.value.metadata_doc.image_type}</button></span>
     </li>
   );
 }
@@ -53,13 +53,15 @@ function ImageSearch(props) {
 function ImageFilterType(props) {
       return (
       <div className="container"  key="{key}">
-        <span className="">{props.header}</span>
+        <span className="">
+          <button  onClick={() => props.onClick(props.header+ '=')}>
+          {props.header}</button></span>
         <ul>
           {Object.keys(props.value).map((key1) => (
             <ImageFilter
-              value={props.value[key1].key}
-              key={props.header+ '--' +props.value[key1].key}
-              onClick={() => props.onClick(props.header+ '--' +props.value[key1].key)} />
+              value={props.value[key1]}
+              key={props.header+ '=' +props.value[key1].key}
+              onClick={() => props.onClick(props.header+ '=' +props.value[key1].key)} />
           ))}
         </ul>
       </div>
@@ -71,9 +73,8 @@ function ImageFilter(props) {
     <div>
       <div className="">
         <li key="{key}">
-          <a href="#" 
-                onClick={props.onClick}>
-                {props.value}</a>
+          <button onClick={props.onClick}>
+                {props.value.key} ({props.value.doc_count})</button>
                 </li>
       </div>
     </div>
@@ -82,7 +83,8 @@ function ImageFilter(props) {
 
 function Favourite(props) {
   return (
-    <li key="{index}">{props.value.user_id} {props.value.favourite_name}</li>
+    <li key="{index}"> <button
+    onClick={props.onClick}>{props.value.user_id} {props.value.favourite_name}</button></li>
   );
 }
 class App extends React.Component {
@@ -98,6 +100,8 @@ class App extends React.Component {
       isLoading: true,
       isLoadingSearch: true,
       search: {},
+      selectedFilter: {},
+      aggregation: null,
     };
   }
 
@@ -119,7 +123,14 @@ class App extends React.Component {
 
   fetchSearch() {
     // Where we're fetching data from
-    fetch(CONFIG.API_BASE_URL)
+    console.log('fetching');
+    var search_url = CONFIG.API_BASE_URL + '?1=1';
+    const selectedFilter = this.state.selectedFilter;
+    for (const [key, value] of Object.entries(selectedFilter)) {
+      search_url += '&' + key + '=' + value;
+    }
+    console.log(search_url);
+    fetch(search_url)
       // We get the API response and receive data in JSON format...
       .then(response => response.json())
       // ...then we update the users state
@@ -129,6 +140,7 @@ class App extends React.Component {
           hits: data['hits'],
           filters: data['aggregations'],
           isLoadingSearch: false,
+          aggregation: data['aggregation'],
         })
       )
       // Catch any errors we hit and update the app
@@ -142,32 +154,48 @@ class App extends React.Component {
   }
 
   handleFilter(i) {
-    const filter = this.state.filters;
+    const selectedFilter = this.state.selectedFilter;
 
-    console.log(i.type);
-    alert(i);  //image_type--photopoint
+    console.log(i);
+    var arr = i.split('=');
+    selectedFilter[arr[0]] = arr[1];
+    this.state.selectedFilter = selectedFilter;
+    console.log(i);
+    this.fetchSearch();
+    console.log(this.state.isLoadingSearch);
+    //console.log(args[0]);
+    //alert(i);  //image_type=photopoint
+}
+
+handleFavourite(i) {
+  const favourites = this.state.favourites;
+
+  console.log(i);
+  //console.log(args[0]);
+  alert(i);  //image_type=photopoint
 }
 
 
   render() {
-    const { isLoading, favourites, filters, search, hits, error } = this.state;
+    const {favourites} = this.state;
     const favs = favourites.map((favourite, index) => {
       return (
         <Favourite
           value={favourite}
           index={index}
-          key={'f'+index} />
+          key={'f'+index}
+          onClick={() => this.handleFavourite(favourite.favourite_name)} />
       );
     });
 
     return (
       <div>
 
-        <h3>Favourites list</h3>
+<div className="left">
+       <h3>Favourites list</h3>
         <ul>
           {favs}
         </ul>
-        <div className="left">
         <h3>Filter</h3>
         <div>
           <ImageSearch
@@ -179,7 +207,9 @@ class App extends React.Component {
         <h3>Search</h3>
         <div>
           <SearchResults
-            value={this.state.hits} />
+            value={this.state.hits}
+            group={this.state.aggregation}
+            onClick={(i) => this.handleFilter(i)} />
         </div>
         </div>
       </div>

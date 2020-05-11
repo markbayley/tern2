@@ -38,10 +38,10 @@ class SearchResult(Resource):
     def get(self):
         args = request.args
         this_filter = SearchFilterModel()
-        if 'node_id' in args:
-            this_filter.node_id = args['node_id']
-        if 'plot_id' in args:
-            this_filter.plot_id = args['plot_id']
+        if 'supersite_node_code' in args:
+            this_filter.supersite_node_code = args['supersite_node_code']
+        if 'plot' in args:
+            this_filter.plot = args['plot']
         if 'site_visit_id' in args:
             this_filter.site_visit_id = args['site_visit_id']
         if 'spatial_search' in args:
@@ -55,10 +55,13 @@ class SearchResult(Resource):
         if 'date_to' in args:
             this_filter.date_to = args['date_to']
         #res = es.get(index="bioimages", id='Shared/tern.data/bioimages/boya_bioimages/lai/core1ha/20180222/DSC00157_N6.JPG')
+
         # return((this_filter.search()))
         # return "hi"
-        res = es.search(index=self.index_name, body=(this_filter.search()))
-        search_result = {'aggregations': {}, 'hits': {}}
+        search = this_filter.search()
+        res = es.search(index=self.index_name, body=(search['_search']))
+        #return(res)
+        search_result = {'aggregations': {}, 'hits': {}, 'aggregation': search['aggregation']}
         for key, result in res['aggregations'].items():
             if (key == 'top_sites'):
                 for entry in result['buckets']:

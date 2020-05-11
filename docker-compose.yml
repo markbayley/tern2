@@ -13,7 +13,7 @@ services:
       - .env
 
   flask-api:
-    container_name: bioimages-api-mine2
+    container_name: bioimages-api
     restart: always
     build:
       context: ./backend/

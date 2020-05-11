@@ -32,9 +32,10 @@
 }
 
 .right {
-  float: right;
+  float: left;
 }
 
 .left {
   float: left;
+  width: 250px;
 }
