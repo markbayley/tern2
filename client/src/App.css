@@ -33,9 +33,15 @@
 
 .right {
   float: left;
+  width:60%;
 }
 
 .left {
   float: left;
   width: 250px;
+}
+
+.leaflet-container {
+  height: 300px;
+  width: 100%;
 }

@@ -1,6 +1,8 @@
 import React from 'react';
 import './App.css';
 import { CONFIG } from './config.js';
+import { Map, Marker, Popup, TileLayer } from 'react-leaflet';
+
 
 const base_image_url = 'https://swift.rc.nectar.org.au/v1/AUTH_05bca33fce34447ba7033b9305947f11/';
 
@@ -102,6 +104,9 @@ class App extends React.Component {
       search: {},
       selectedFilter: {},
       aggregation: null,
+      lat: -27.47,
+      lng: 143.02,
+      zoom: 4
     };
   }
 
@@ -140,7 +145,7 @@ class App extends React.Component {
           hits: data['hits'],
           filters: data['aggregations'],
           isLoadingSearch: false,
-          aggregation: data['aggregation'],
+          aggregation: data['aggregation']
         })
       )
       // Catch any errors we hit and update the app
@@ -179,6 +184,9 @@ class App extends React.Component {
   }
 
 
+
+
+
   render() {
     const { favourites } = this.state;
     const favs = favourites.map((favourite, index) => {
@@ -191,9 +199,13 @@ class App extends React.Component {
       );
     });
 
+    const position = [this.state.lat, this.state.lng];
     return (
       <div>
 
+      
+
+        <div>
         <div className="left">
           <h3>Favourites list</h3>
           <ul>
@@ -207,6 +219,21 @@ class App extends React.Component {
           </div>
         </div>
         <div className="right">
+          <div id="container">
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css"
+          integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
+          crossOrigin=""/>
+        <Map center={position} zoom={this.state.zoom}>
+          <TileLayer
+            attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+            url='https://{s}.tile.osm.org/{z}/{x}/{y}.png'
+          />
+          <Marker position={position}>
+            <Popup>
+              A pretty CSS3 popup. <br/> Easily customizable.
+            </Popup>
+          </Marker>
+        </Map></div>
           <h3>Search</h3>
           <div>
             <SearchResults
@@ -215,6 +242,9 @@ class App extends React.Component {
               onClick={(i) => this.handleFilter(i)} />
           </div>
         </div>
+      </div>
+
+     
       </div>
     );
   }
