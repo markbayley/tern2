@@ -1,8 +1,9 @@
 import React from 'react';
 import './App.css';
 import { CONFIG } from './config.js';
-import { Map, Marker, Popup, TileLayer } from 'react-leaflet';
-
+import { Map, Marker, Popup, Tooltip, TileLayer } from 'react-leaflet';
+import Wkt from 'wicket';
+import wkt_coords from 'wicket';
 
 const base_image_url = 'https://swift.rc.nectar.org.au/v1/AUTH_05bca33fce34447ba7033b9305947f11/';
 
@@ -89,6 +90,20 @@ function Favourite(props) {
       onClick={props.onClick}>{props.value.user_id} {props.value.favourite_name}</button></li>
   );
 }
+
+function getPosition(location) {
+  var wkt = new Wkt.Wkt();
+  wkt.read(location);
+  var values = wkt_coords(wkt)._wrapped.components;
+  var returnValue = [parseInt(values[0]['y']), parseInt(values[0]['x']) ];
+  if (isNaN(returnValue[0])) {
+    returnValue = [parseInt(values[0][0]['y']), parseInt(values[0][0]['x'])];
+  }
+  console.log(returnValue);
+  return returnValue;
+  //return [ -27.47, 143.02];
+}
+
 class App extends React.Component {
 
   constructor() {
@@ -183,10 +198,6 @@ class App extends React.Component {
     alert(i);  //image_type=photopoint
   }
 
-
-
-
-
   render() {
     const { favourites } = this.state;
     const favs = favourites.map((favourite, index) => {
@@ -203,48 +214,48 @@ class App extends React.Component {
     return (
       <div>
 
-      
-
         <div>
-        <div className="left">
-          <h3>Favourites list</h3>
-          <ul>
-            {favs}
-          </ul>
-          <h3>Filter</h3>
-          <div>
-            <ImageSearch
-              value={this.state.filters}
-              onClick={(i) => this.handleFilter(i)} />
+          <div className="left">
+            <h3>Favourites list</h3>
+            <ul>
+              {favs}
+            </ul>
+            <h3>Filter</h3>
+            <div>
+              <ImageSearch
+                value={this.state.filters}
+                onClick={(i) => this.handleFilter(i)} />
+            </div>
+          </div>
+          <div className="right">
+            <div id="container">
+              <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css"
+                integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
+                crossOrigin="" />
+              <Map center={position} zoom={this.state.zoom}>
+                <TileLayer
+                  attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+                  url='https://{s}.tile.osm.org/{z}/{x}/{y}.png'
+                />
+                {Object.keys(this.state.hits).map((index, value) => (
+                    <Marker key={index}
+                    position={getPosition(this.state.hits[index].location)}>
+                    <Popup>Another popup {index}</Popup>
+                    <Tooltip>{index} Tooltip for Marker</Tooltip>
+                </Marker>
+                ))}
+              </Map></div>
+            <h3>Search</h3>
+            <div>
+              <SearchResults
+                value={this.state.hits}
+                group={this.state.aggregation}
+                onClick={(i) => this.handleFilter(i)} />
+            </div>
           </div>
         </div>
-        <div className="right">
-          <div id="container">
-        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css"
-          integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
-          crossOrigin=""/>
-        <Map center={position} zoom={this.state.zoom}>
-          <TileLayer
-            attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-            url='https://{s}.tile.osm.org/{z}/{x}/{y}.png'
-          />
-          <Marker position={position}>
-            <Popup>
-              A pretty CSS3 popup. <br/> Easily customizable.
-            </Popup>
-          </Marker>
-        </Map></div>
-          <h3>Search</h3>
-          <div>
-            <SearchResults
-              value={this.state.hits}
-              group={this.state.aggregation}
-              onClick={(i) => this.handleFilter(i)} />
-          </div>
-        </div>
-      </div>
 
-     
+
       </div>
     );
   }
