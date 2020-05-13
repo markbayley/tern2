@@ -1,5 +1,5 @@
 import json
-
+import datetime
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.ext.declarative import DeclarativeMeta
 
@@ -47,12 +47,16 @@ class SearchFilter(db.Model):
                           unique=False, nullable=True)
     date_to = db.Column(db.DateTime, index=False, unique=False, nullable=True)
     image_id = None
+    camera_make = db.Column(db.String(50), nullable=True)
+    camera_model = db.Column(db.String(50), nullable=True)
 
     def __repr__(self):
         return '<SearchFilter %r>' % self.supersite_node_code + ' ' + self.search_filter_id
 
     def search(self):
         query = []
+        this_filter = []
+        this_date = []
         query.append({
             "terms": {
                 "source_extension":  ['nef', 'cr2', 'jpeg', 'jpg', 'arw'],
@@ -62,7 +66,7 @@ class SearchFilter(db.Model):
         aggregation = "metadata_doc.supersite_node_code.keyword"
         next_filter = 'supersite_node_code'
         if self.supersite_node_code:
-            query.append({
+            this_filter.append({
                 "term": {
                     "metadata_doc.supersite_node_code":  self.supersite_node_code
                 }
@@ -71,7 +75,7 @@ class SearchFilter(db.Model):
             next_filter = 'image_type'
 
         if self.image_type:
-            query.append({
+            this_filter.append({
                 "term": {
                     "metadata_doc.image_type":  self.image_type
                 }
@@ -83,7 +87,7 @@ class SearchFilter(db.Model):
                 next_filter = 'supersite_node_code'
 
         if self.plot:
-            query.append({
+            this_filter.append({
                 "term": {
                     "metadata_doc.plot": self.plot
                 }
@@ -111,6 +115,53 @@ class SearchFilter(db.Model):
                 }
             })
 
+        if self.date_to or self.date_from:
+            this_date_to = datetime.datetime.now()
+            this_date_from = datetime.datetime.strptime("197001", "%Y%m")
+            if self.date_from:
+                this_date_from = datetime.datetime.strptime(
+                    self.date_from, "%Y%m")
+
+            if self.date_to:
+                this_date_to = datetime.datetime.strptime(self.date_to, "%Y%m")
+
+            query.append({
+                "range": {
+                    "metadata_doc.date_file_created": {
+                        "time_zone": "-10:00",
+                        "gte": datetime.datetime.strftime(this_date_from, "%Y-%m-%d") + "||/M",
+                        "lte": datetime.datetime.strftime(this_date_to, "%Y-%m-%d") + "||/M"
+                    }
+                }
+            })
+
+        if 1 == 2 and self.spatial_search:
+            this_filter.append({
+                "geo_shape": {
+                    "location": {
+                        "shape": {
+                            "type": "envelope",
+                            "coordinates": [
+                                    [
+                                        143.56358714103,
+                                        -40.21165878103
+                                    ],
+                                [
+                                        150.15538401603,
+                                        -43.928812500965
+                                    ]
+                            ]
+                        },
+                        "relation": "intersects"
+                    }
+                }
+            })
+            this_filter.append({
+                "geo_shape": {
+                    "location": self.spatial_search
+                }
+            })
+
         if self.image_id:
             query.append({
                 "term": {
@@ -121,70 +172,107 @@ class SearchFilter(db.Model):
         if aggregation == '_id':
             size = 20
 
-        return {"aggregation": next_filter, "_search": {
-            "size": size,
-            "query": {
-                "bool": {"filter": query}},
-            "aggs": {
-                "top_sites": {
-                    "terms": {
-                        "field": aggregation,
-                        "order": {"top_hit": "desc"},
-                        "size": "20",
+        aggregations = {
+            "top_sites": {
+                "terms": {
+                    "field": aggregation,
+                    "order": {"top_hit": "desc"},
+                    "size": "20",
+                },
+                "aggs": {
+                    "top_tags_hits": {
+                        "top_hits": {
+                            "_source": {
+                                "includes": [
+                                    "published_basename",
+                                    "id",
+                                    "metadata_doc.supersite_node_code",
+                                    "metadata_doc.plot",
+                                    "published_paths",
+                                    "metadata_doc.image_type",
+                                    "location",
+                                    "published_root",
+                                    "metadata_doc.collection_date"
+                                ]
+                            },
+                            "size": 1
+                        }
                     },
-                    "aggs": {
-                        "top_tags_hits": {
-                            "top_hits": {
-                                "_source": {
-                                    "includes": [
-                                        "published_basename",
-                                        "id",
-                                        "metadata_doc.supersite_node_code",
-                                        "metadata_doc.plot",
-                                        "published_paths",
-                                        "metadata_doc.image_type",
-                                        "location",
-                                        "published_root",
-                                        "metadata_doc.collection_date"
-                                    ]
-                                },
-                                "size": 1
-                            }
-                        },
-                        "top_hit": {
-                            "max": {
-                                "script": {
-                                    "source": "_score"
-                                }
+                    "top_hit": {
+                        "max": {
+                            "script": {
+                                "source": "_score"
                             }
                         }
                     }
-                },
-                "supersite_node_code": {
-                    # "filter": {"bool": {"filter": query}},
-                    "terms": {
-                        "field": "metadata_doc.supersite_node_code.keyword",
-                        "min_doc_count": 1,
-                        "order": {"_key": "asc"},
-                        "size": 20
-                    }
-                },
-                "image_type": {
-                    "terms": {
-                        "field": "metadata_doc.image_type.keyword",
-                        "min_doc_count": 1,
-                        "order": {"_key": "asc"}
-                    }
-                },
-                "plot": {
-                    "terms": {
-                        "field": "metadata_doc.plot.keyword",
-                        "min_doc_count": 1,
-                        "order": {"_key": "asc"},
-                        "size": 150
-                    }
+                }
+            },
+            "supersite_node_code": {
+                # "filter": {"bool": {"filter": query}},
+                "terms": {
+                    "field": "metadata_doc.supersite_node_code.keyword",
+                    "min_doc_count": 1,
+                    "order": {"_key": "asc"},
+                    "size": 20
+                }
+            },
+            "image_type": {
+                "terms": {
+                    "field": "metadata_doc.image_type.keyword",
+                    "min_doc_count": 1,
+                    "order": {"_key": "asc"}
+                }
+            },
+            "plot": {
+                "terms": {
+                    "field": "metadata_doc.plot.keyword",
+                    "min_doc_count": 1,
+                    "order": {"_key": "asc"},
+                    "size": 150
                 }
             }
+
+        }
+
+        if 1 == 2 and self.camera_make:
+            this_filter.append({
+                "term": {
+                    "camera_make":  self.camera_make
+                }
+            })
+
+            aggregations['camera_make'] = {
+                "terms": {
+                    "field": "camera_make.keyword",
+                    "min_doc_count": 1,
+                    "order": {"_key": "asc"},
+                    "size": 150
+                }
+            }
+
+        if 1 == 2 and fself.camera_model:
+            this_filter.append({
+                "term": {
+                    "camera_make":  self.camera_make
+                }
+            })
+
+            aggregations['camera_model'] = {
+                "terms": {
+                    "field": "camera_model.keyword",
+                    "min_doc_count": 1,
+                    "order": {"_key": "asc"},
+                    "size": 150
+                }
+            }
+
+        return {"aggregation": next_filter, "_search": {
+            "size": size,
+            "query": {
+                "bool": {"filter": this_filter,
+                         "must": query}
+            },
+            "aggs": aggregations
         }
         }
 

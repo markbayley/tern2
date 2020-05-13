@@ -92,16 +92,15 @@ function Favourite(props) {
 }
 
 function getPosition(location) {
+  return location;
   var wkt = new Wkt.Wkt();
   wkt.read(location);
   var values = wkt_coords(wkt)._wrapped.components;
-  var returnValue = [parseInt(values[0]['y']), parseInt(values[0]['x']) ];
+  var returnValue = [parseInt(values[0]['y'],10), parseInt(values[0]['x'],10) ];
   if (isNaN(returnValue[0])) {
-    returnValue = [parseInt(values[0][0]['y']), parseInt(values[0][0]['x'])];
+    returnValue = [parseInt(values[0][0]['y'],10), parseInt(values[0][0]['x'],10)];
   }
-  console.log(returnValue);
   return returnValue;
-  //return [ -27.47, 143.02];
 }
 
 class App extends React.Component {
@@ -239,7 +238,7 @@ class App extends React.Component {
                 />
                 {Object.keys(this.state.hits).map((index, value) => (
                     <Marker key={index}
-                    position={getPosition(this.state.hits[index].location)}>
+                    position={getPosition(this.state.hits[index].centre_point)}>
                     <Popup>Another popup {index}</Popup>
                     <Tooltip>{index} Tooltip for Marker</Tooltip>
                 </Marker>
