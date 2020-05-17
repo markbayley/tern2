@@ -91,16 +91,49 @@ function Favourite(props) {
   );
 }
 
-function getPosition(location) {
-  return location;
-  var wkt = new Wkt.Wkt();
-  wkt.read(location);
-  var values = wkt_coords(wkt)._wrapped.components;
-  var returnValue = [parseInt(values[0]['y'],10), parseInt(values[0]['x'],10) ];
-  if (isNaN(returnValue[0])) {
-    returnValue = [parseInt(values[0][0]['y'],10), parseInt(values[0][0]['x'],10)];
+function ImageMarkers(props) {
+  console.log('hello');
+  console.log(props.value);
+  var popup = "";
+  var tooltip = "";
+  var id = props.location;
+  var position = props.value.centre_point;
+  console.log(id);
+  console.log(position);
+  for (var this_key in props.value.image_types) {
+    console.log(this_key);
+    popup += this_key + "(" + props.value.image_types[this_key] + ") \r\n";
+    tooltip += props.value.image_types[this_key] + " - " + this_key;
   }
-  return returnValue;
+  console.log(popup);
+  return (
+    /*Object.keys(props.value.image_types).map((index) => (
+      <ImageMarker
+        value={props.value.image_types[index]}
+        type={index}
+        site={props.value.supersite_node_code}
+        position={props.value.centre_point}
+        id={props.value.supersite_node_code + index}
+        key={props.value.supersite_node_code + index} />
+    //)) */
+    <ImageMarker
+      value={popup}
+      type={id}
+      site={id}
+      position={position}
+      id={id}
+      key={id} />
+  );
+
+}
+function ImageMarker(props) {
+  return (
+    <Marker key={props.id}
+      position={props.position}>
+      <Popup>Popup {props.type} - {props.value}</Popup>
+      <Tooltip>{props.type} - {props.value} Tooltip</Tooltip>
+    </Marker>
+  );
 }
 
 class App extends React.Component {
@@ -236,12 +269,10 @@ class App extends React.Component {
                   attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
                   url='https://{s}.tile.osm.org/{z}/{x}/{y}.png'
                 />
-                {Object.keys(this.state.hits).map((index, value) => (
-                    <Marker key={index}
-                    position={getPosition(this.state.hits[index].centre_point)}>
-                    <Popup>Another popup {index}</Popup>
-                    <Tooltip>{index} Tooltip for Marker</Tooltip>
-                </Marker>
+                {Object.keys(this.state.hits).map((index) => (
+                  <ImageMarkers
+                    value={this.state.hits[index]}
+                    location={index} />
                 ))}
               </Map></div>
             <h3>Search</h3>

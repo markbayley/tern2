@@ -77,25 +77,38 @@ class SearchResult(Resource):
         # return(res)
         search_result = {'aggregations': {}, 'hits': {},
                          'aggregation': search['aggregation']}
+        image_count_per_site = res['aggregations']["supersite_node_code"]["buckets"]
+        images = {}
+        for element in image_count_per_site:
+            images[element['key']] = {}
+            for items in element['image_type']['buckets']:
+                images[element['key']][items['key']] = items['doc_count']
+
+        # return images
+
         for key, result in res['aggregations'].items():
             if (key == 'top_sites'):
                 for entry in result['buckets']:
-                    if entry['key'].startswith('.'):
+                    this_key = entry['key']
+                    if this_key.startswith('.'):
                         continue
 
-                    search_result['hits'][entry['key']
-                                          ] = entry['top_tags_hits']['hits']['hits'][0]['_source']
-                    search_result['hits'][entry['key']]['thumbnail_path'] = [
-                        s for s in search_result['hits'][entry['key']]['published_paths'] if thumb_size in s][0]
-                    search_result['hits'][entry['key']
-                                          ]['doc_count'] = entry['doc_count']
-                    search_result['hits'][entry['key']]['name'] = entry['top_tags_hits'][
+                    search_result['hits'][this_key] = entry['top_tags_hits']['hits']['hits'][0]['_source']
+                    search_result['hits'][this_key]['thumbnail_path'] = [
+                        s for s in search_result['hits'][this_key]['published_paths'] if thumb_size in s][0]
+                    search_result['hits'][this_key]['doc_count'] = entry['doc_count']
+                    search_result['hits'][this_key]['name'] = entry['top_tags_hits'][
                         'hits']['hits'][0]['_source']['metadata_doc']['supersite_node_code']
                     arr_location = shapely.wkt.loads(
-                        search_result['hits'][entry['key']]['location'])
+                        search_result['hits'][this_key]['location'])
                     centre = list(arr_location.representative_point().coords)
-                    search_result['hits'][entry['key']]['centre_point'] = [
+                    search_result['hits'][this_key]['centre_point'] = [
                         centre[0][1], centre[0][0]]
+
+                    if this_key in images.keys():
+                        search_result['hits'][this_key]['image_types'] = images[this_key]
+                    else:
+                        search_result['hits'][this_key]['image_types'] = {}
             else:
                 search_result['aggregations'][key] = (result['buckets'])
 

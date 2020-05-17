@@ -149,7 +149,7 @@ class SearchFilter(db.Model):
                                 [
                                         150.15538401603,
                                         -43.928812500965
-                                    ]
+                                        ]
                             ]
                         },
                         "relation": "intersects"
@@ -208,12 +208,19 @@ class SearchFilter(db.Model):
                 }
             },
             "supersite_node_code": {
-                # "filter": {"bool": {"filter": query}},
                 "terms": {
                     "field": "metadata_doc.supersite_node_code.keyword",
-                    "min_doc_count": 1,
                     "order": {"_key": "asc"},
                     "size": 20
+                },
+                "aggs": {
+                    "image_type": {
+                        "terms": {
+                            "field": "metadata_doc.image_type.keyword",
+                            "min_doc_count": 1,
+                            "order": {"_key": "asc"}
+                        }
+                    }
                 }
             },
             "image_type": {
