@@ -58,7 +58,8 @@ function ImageFilterType(props) {
     <div className="container" key="{key}">
       <span className="">
         <button onClick={() => props.onClick(props.header + '=')}>
-          {props.header}</button></span>
+          {props.header}</button>
+      </span>
       <ul>
         {Object.keys(props.value).map((key1) => (
           <ImageFilter
@@ -103,9 +104,10 @@ function ImageMarkers(props) {
   for (var this_key in props.value.image_types) {
     console.log(this_key);
     for (var sub_key in props.value.image_types[this_key]) {
-      var site_key = this_key;
-      if (sub_key != "total") {
-        site_key = sub_key
+      var site_key = sub_key;
+      console.log(Object.keys(props.value.image_types[this_key]).length)
+      if (sub_key == "total" && Object.keys(props.value.image_types[this_key]).length == 1) {
+        site_key = this_key;
       }
       popup += site_key + "(" + props.value.image_types[this_key][sub_key] + ") \r\n";
       tooltip += props.value.image_types[this_key] + " - " + this_key;
@@ -130,15 +132,6 @@ function ImageMarkers(props) {
         key={id} />
     );
   }
-  return (
-    <ImageMarker
-      value={popup}
-      type={id}
-      site={id}
-      position={position}
-      id={id}
-      key={id} />
-  )
 }
 function ImageMarker(props) {
   return (
