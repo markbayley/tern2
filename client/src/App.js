@@ -31,7 +31,7 @@ function SearchResult(props) {
   return (
     <li id={props.id}>
       <img src={img_url} /><br />
-      <span className="space-left"><button onClick={() => props.onClick(props.id)}>key:{props.id} - count: {props.value.doc_count}- id:{props.value._id} - node:{props.value.metadata_doc.supersite_node_code} - img:{props.value.metadata_doc.image_type}</button></span>
+      <span className="space-left"><button onClick={() => props.onClick(props.id)}>key:{props.id} - count: {props.value.doc_count}- id:{props.value._id} - node:{props.value.metadata_doc.site_id_new.value} - img:{props.value.metadata_doc.image_type_new.value}</button></span>
     </li>
   );
 }
@@ -87,7 +87,7 @@ function ImageFilter(props) {
 function Favourite(props) {
   return (
     <li key="{index}"> <button
-      onClick={props.onClick}>{props.value.user_id} {props.value.favourite_name}</button></li>
+      onClick={props.onClick}>{props.value.user_id} {props.value.favourite_name} ({props.value.favourites_id})</button></li>
   );
 }
 
@@ -102,20 +102,35 @@ function ImageMarkers(props) {
   console.log(position);
   for (var this_key in props.value.image_types) {
     console.log(this_key);
-    popup += this_key + "(" + props.value.image_types[this_key] + ") \r\n";
-    tooltip += props.value.image_types[this_key] + " - " + this_key;
-  }
-  console.log(popup);
-  return (
-    /*Object.keys(props.value.image_types).map((index) => (
+    for (var sub_key in props.value.image_types[this_key]) {
+      var site_key = this_key;
+      if (sub_key != "total") {
+        site_key = sub_key
+      }
+      popup += site_key + "(" + props.value.image_types[this_key][sub_key] + ") \r\n";
+      tooltip += props.value.image_types[this_key] + " - " + this_key;
+    }
+    console.log(popup);
+    return (
+      /*Object.keys(props.value.image_types).map((index) => (
+        <ImageMarker
+          value={props.value.image_types[index]}
+          type={index}
+          site={props.value.supersite_node_code}
+          position={props.value.centre_point}
+          id={props.value.supersite_node_code + index}
+          key={props.value.supersite_node_code + index} />
+      //)) */
       <ImageMarker
-        value={props.value.image_types[index]}
-        type={index}
-        site={props.value.supersite_node_code}
-        position={props.value.centre_point}
-        id={props.value.supersite_node_code + index}
-        key={props.value.supersite_node_code + index} />
-    //)) */
+        value={popup}
+        type={id}
+        site={id}
+        position={position}
+        id={id}
+        key={id} />
+    );
+  }
+  return (
     <ImageMarker
       value={popup}
       type={id}
@@ -123,8 +138,7 @@ function ImageMarkers(props) {
       position={position}
       id={id}
       key={id} />
-  );
-
+  )
 }
 function ImageMarker(props) {
   return (
@@ -176,7 +190,7 @@ class App extends React.Component {
   fetchSearch() {
     // Where we're fetching data from
     console.log('fetching');
-    var search_url = CONFIG.API_BASE_URL + '?1=1';
+    var search_url = CONFIG.API_BASE_URL + 'search?1=1';
     const selectedFilter = this.state.selectedFilter;
     for (const [key, value] of Object.entries(selectedFilter)) {
       search_url += '&' + key + '=' + value;
@@ -248,10 +262,7 @@ class App extends React.Component {
 
         <div>
           <div className="left">
-            <h3>Favourites list</h3>
-            <ul>
-              {favs}
-            </ul>
+
             <h3>Filter</h3>
             <div>
               <ImageSearch
@@ -282,6 +293,12 @@ class App extends React.Component {
                 group={this.state.aggregation}
                 onClick={(i) => this.handleFilter(i)} />
             </div>
+          </div>
+          <div className="favs">
+            <h3>Favourites list</h3>
+            <ul>
+              {favs}
+            </ul>
           </div>
         </div>
 
