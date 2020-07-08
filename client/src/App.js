@@ -4,6 +4,9 @@ import { CONFIG } from './config.js';
 import { Map, Marker, Popup, Tooltip, TileLayer } from 'react-leaflet';
 import Wkt from 'wicket';
 import wkt_coords from 'wicket';
+//import { DateRangePicker } from 'react-date-range';
+/*import 'react-date-range/dist/styles.css'; // main style file
+import 'react-date-range/dist/theme/default.css'; // theme css file*/
 
 const base_image_url = 'https://swift.rc.nectar.org.au/v1/AUTH_05bca33fce34447ba7033b9305947f11/';
 
@@ -27,11 +30,11 @@ function SearchResults(props) {
 
 }
 function SearchResult(props) {
-  const img_url = base_image_url + props.value.published_root + '/' + props.value.thumbnail_path;
+  const img_url = props.value.thumbnail_url;
   return (
     <li id={props.id}>
       <img src={img_url} /><br />
-      <span className="space-left"><button onClick={() => props.onClick(props.id)}>key:{props.id} - count: {props.value.doc_count}- id:{props.value._id} - node:{props.value.metadata_doc.site_id_new.value} - img:{props.value.metadata_doc.image_type_new.value}</button></span>
+      <span className="space-left"><button onClick={() => props.onClick(props.id)}>key:{props.id} - count: {props.value.doc_count}- id:{props.value._id} - node:{props.value.site_id.value} - img:{props.value.image_type.value}</button></span>
     </li>
   );
 }
@@ -78,7 +81,7 @@ function ImageFilter(props) {
       <div className="">
         <li key="{key}">
           <button onClick={props.onClick}>
-            {props.value.key} ({props.value.doc_count})</button>
+            {props.value.label} ({props.value.doc_count})</button>
         </li>
       </div>
     </div>
@@ -113,26 +116,29 @@ function ImageMarkers(props) {
       tooltip += props.value.image_types[this_key] + " - " + this_key;
     }
     console.log(popup);
-    return (
-      /*Object.keys(props.value.image_types).map((index) => (
-        <ImageMarker
-          value={props.value.image_types[index]}
-          type={index}
-          site={props.value.supersite_node_code}
-          position={props.value.centre_point}
-          id={props.value.supersite_node_code + index}
-          key={props.value.supersite_node_code + index} />
-      //)) */
-      <ImageMarker
-        value={popup}
-        type={id}
-        site={id}
-        position={position}
-        id={id}
-        key={id} />
-    );
+    console.log('this is the popup for ' + this_key);
   }
+
+  return (
+    /*Object.keys(props.value.image_types).map((index) => (
+      <ImageMarker
+        value={props.value.image_types[index]}
+        type={index}
+        site={props.value.supersite_node_code}
+        position={props.value.centre_point}
+        id={props.value.supersite_node_code + index}
+        key={props.value.supersite_node_code + index} />
+    //)) */
+    <ImageMarker
+      value={popup}
+      type={id}
+      site={id}
+      position={position}
+      id={id}
+      key={id} />
+  );
 }
+
 function ImageMarker(props) {
   return (
     <Marker key={props.id}
@@ -163,6 +169,16 @@ class App extends React.Component {
       zoom: 4
     };
   }
+
+  /*handleSelect(ranges) {
+    console.log(ranges);
+    // {
+    //   selection: {
+    //     startDate: [native Date Object],
+    //     endDate: [native Date Object],
+    //   }
+    // }
+  }*/
 
   fetchFavourites() {
     // Where we're fetching data from
@@ -250,6 +266,13 @@ class App extends React.Component {
     });
 
     const position = [this.state.lat, this.state.lng];
+    const selectionRange = {
+      startDate: new Date(),
+      endDate: new Date(),
+      key: 'selection',
+    }
+
+
     return (
       <div>
 
@@ -262,6 +285,7 @@ class App extends React.Component {
                 value={this.state.filters}
                 onClick={(i) => this.handleFilter(i)} />
             </div>
+
           </div>
           <div className="right">
             <div id="container">
