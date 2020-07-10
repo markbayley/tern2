@@ -944,6 +944,31 @@ a {
  
 }
 
+.custom-marker {
+	box-sizing: border-box;
+	color: #fff;
+	font-weight: bold;
+	background: #065f65;
+
+	border-radius: 50%;
+	border: 3px solid rgba(149, 219, 199);
+  }
+  .leaflet-popup-content-wrapper, .leaflet-popup-tip {
+	  background: #826fa9;
+	  color: #fff;
+	  box-shadow: 0 0 0 3px #fff, 0 3px 14px rgba(0,0,0,0.4);
+
+  }
+
+  .custom-marker:hover {
+	background: #E36A51; 
+	border: -10px solid rgba(149, 219, 199);
+	transition: background 0.5s, border 0.3s, border-radius 0.3s, box-shadow 0.3s;
+	size: 3em;
+  }
+
+
+
 
 
 
