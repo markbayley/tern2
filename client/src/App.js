@@ -20,10 +20,7 @@ const base_image_url = 'https://swift.rc.nectar.org.au/v1/AUTH_05bca33fce34447ba
 
 function SearchResults(props) {
   return (
-  
- 
     <Row >
-  
           {Object.keys(props.value).map((index, value) => (
             <SearchResult
               value={props.value[index]}
@@ -32,24 +29,19 @@ function SearchResults(props) {
               onClick={(i) => props.onClick(i)} />
           ))
           }
-      
       </Row>
-    
   );
-
 }
+
 function SearchResult(props) {
   const img_url = props.value.thumbnail_url;
   return (
-
     <Col xl={3} >
     <Card id={props.id} style={{marginTop: "5%"}}>
       <img src={img_url} style={{height: "210px"}}/>
       <span className="center" ><Button variant="outline-secondary" style={{width: "100%"}} onClick={() => props.onClick(props.id)}>  <strong>Site:</strong> { props.value.site_id.value}  <strong>Image Type:</strong> { props.value.image_type.value} <br /> <strong>Image Count:</strong> { props.value.doc_count}  </Button></span>
     </Card>
     </Col>
- 
-  
   );
 }
 
@@ -57,18 +49,13 @@ function SearchResult(props) {
 function ImageSearch(props) {
   return (
    <div>
-   
         {Object.keys(props.value).map((key, indexer) => (
-          
           <ImageFilterType 
             value={props.value[key]}
             header={key}
             key={key}
-        
-            onClick={(i) => props.onClick(i)} />
-           
+            onClick={(i) => props.onClick(i)} /> 
         ))}
-      
   </div>
   );
 }
@@ -297,10 +284,9 @@ class App extends React.Component {
         <TopBar />
         <SearchBar />
        
-
         <Row >
           <Col xl={2} style={{ borderRight: "55px solid rgba(149, 219, 199, 0.5)"}}>
-         
+          { /*Filter SideBar*/}
           <ImageSearch
                     value={this.state.filters}
                     onClick={(i) => this.handleFilter(i)} />
@@ -330,7 +316,8 @@ class App extends React.Component {
               { /*End of Leaflet  Map */}
 
               <h5>Breadcrumb</h5>
-           
+
+              { /*Photo Gallery */}
                 <SearchResults    
                 value={this.state.hits}
                 group={this.state.aggregation}
