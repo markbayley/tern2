@@ -2,30 +2,30 @@ version: '3.5'
 
 services:
 
-  db:
-    container_name: bioimages-db
-    image: postgres
-    ports:
-      - 5432:5432
-    volumes:
-      - ./volumes/db:/var/lib/postgresql/data
-    env_file:
-      - .env
+  # db:
+  #   container_name: bioimages-db
+  #   image: postgres
+  #   ports:
+  #     - 5432:5432
+  #   volumes:
+  #     - ./volumes/db:/var/lib/postgresql/data
+  #   env_file:
+  #     - .env
 
-  flask-api:
-    container_name: bioimages-api
-    restart: always
-    build:
-      context: ./backend/
-      dockerfile: Dockerfile
-    ports:
-      - 5000:80
-    volumes:
-      - ./backend:/usr/src/app
-    depends_on:
-      - db
-    env_file:
-      - .env
+  # flask-api:
+  #   container_name: bioimages-api
+  #   restart: always
+  #   build:
+  #     context: ./backend/
+  #     dockerfile: Dockerfile
+  #   ports:
+  #     - 5000:80
+  #   volumes:
+  #     - ./backend:/usr/src/app
+  #   depends_on:
+  #     - db
+  #   env_file:
+  #     - .env
 
   client:
     container_name: react-app
@@ -37,9 +37,9 @@ services:
       - '/usr/src/app/node_modules'
     ports:
       - 3000:3000
-    depends_on:
-      - flask-api
+    # depends_on:
+    #   - flask-api
     environment:
       - NODE_ENV=development
       - CHOKIDAR_USEPOLLING=true
-      - HOST_URL=http://0.0.0.0:5000
+      - HOST_URL='https://bioimages-test.tern.org.au/api/v1.0/'

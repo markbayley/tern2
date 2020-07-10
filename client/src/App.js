@@ -1,20 +1,29 @@
-import React from 'react';
+import React, { Fragment } from 'react';
 import './App.css';
 import { CONFIG } from './config.js';
 import { Map, Marker, Popup, Tooltip, TileLayer } from 'react-leaflet';
 import Wkt from 'wicket';
 import wkt_coords from 'wicket';
+import 'bootstrap/dist/css/bootstrap.min.css';
 //import { DateRangePicker } from 'react-date-range';
 /*import 'react-date-range/dist/styles.css'; // main style file
 import 'react-date-range/dist/theme/default.css'; // theme css file*/
+import TopBar from './TopBar'
+
+import Footer from './Footer';
+import { Accordion, Card, CardTitle, Container, Button, Col, Row, Form} from "react-bootstrap";
+import SearchBar from './SearchBar'
+import IconBar from './IconBar'
+
 
 const base_image_url = 'https://swift.rc.nectar.org.au/v1/AUTH_05bca33fce34447ba7033b9305947f11/';
 
 function SearchResults(props) {
   return (
-    <div>
-      <div className="right">
-        <ul>
+  
+ 
+    <Row >
+  
           {Object.keys(props.value).map((index, value) => (
             <SearchResult
               value={props.value[index]}
@@ -23,46 +32,54 @@ function SearchResults(props) {
               onClick={(i) => props.onClick(i)} />
           ))
           }
-        </ul>
-      </div>
-    </div>
+      
+      </Row>
+    
   );
 
 }
 function SearchResult(props) {
   const img_url = props.value.thumbnail_url;
   return (
-    <li id={props.id}>
-      <img src={img_url} /><br />
-      <span className="space-left"><button onClick={() => props.onClick(props.id)}>key:{props.id} - count: {props.value.doc_count}- id:{props.value._id} - node:{props.value.site_id.value} - img:{props.value.image_type.value}</button></span>
-    </li>
+
+    <Col xl={3} >
+    <Card id={props.id} style={{marginTop: "5%"}}>
+      <img src={img_url} style={{height: "210px"}}/>
+      <span className="center" ><Button variant="outline-secondary" style={{width: "100%"}} onClick={() => props.onClick(props.id)}>  <strong>Site:</strong> { props.value.site_id.value}  <strong>Image Type:</strong> { props.value.image_type.value} <br /> <strong>Image Count:</strong> { props.value.doc_count}  </Button></span>
+    </Card>
+    </Col>
+ 
+  
   );
 }
 
 
 function ImageSearch(props) {
   return (
-    <div>
-      <div className="">
+   <div>
+   
         {Object.keys(props.value).map((key, indexer) => (
-          <ImageFilterType
+          
+          <ImageFilterType 
             value={props.value[key]}
             header={key}
             key={key}
+        
             onClick={(i) => props.onClick(i)} />
+           
         ))}
-      </div>
-    </div>
+      
+  </div>
   );
 }
 
 function ImageFilterType(props) {
   return (
-    <div className="container" key="{key}">
-      <span className="">
-        <button onClick={() => props.onClick(props.header + '=')}>
-          {props.header}</button>
-      </span>
+    <div style={{marginLeft: "4%"}} key="{key}">
+     
+        <Button style={{width: "100%"}} variant="outline-success" onClick={() => props.onClick(props.header + '=')}>
+          {props.header}</Button>
+   
       <ul>
         {Object.keys(props.value).map((key1) => (
           <ImageFilter
@@ -79,10 +96,10 @@ function ImageFilter(props) {
   return (
     <div>
       <div className="">
-        <li key="{key}">
-          <button onClick={props.onClick}>
-            {props.value.label} ({props.value.doc_count})</button>
-        </li>
+        <div key="{key}">
+          <Button style={{width: "100%"}} variant="outline-secondary" onClick={props.onClick}>
+            {props.value.label} ({props.value.doc_count})</Button>
+        </div>
       </div>
     </div>
   );
@@ -166,7 +183,7 @@ class App extends React.Component {
       aggregation: null,
       lat: -27.47,
       lng: 143.02,
-      zoom: 4
+      zoom: 5
     };
   }
 
@@ -224,7 +241,7 @@ class App extends React.Component {
 
 
   componentDidMount() {
-    this.fetchFavourites()
+    //this.fetchFavourites()
     this.fetchSearch()
   }
 
@@ -257,6 +274,7 @@ class App extends React.Component {
     const { favourites } = this.state;
     const favs = favourites.map((favourite, index) => {
       return (
+
         <Favourite
           value={favourite}
           index={index}
@@ -274,53 +292,67 @@ class App extends React.Component {
 
 
     return (
-      <div>
+      <Fragment>
 
-        <div>
-          <div className="left">
+        <TopBar />
+        <SearchBar />
+       
 
-            <h3>Filter</h3>
-            <div>
-              <ImageSearch
-                value={this.state.filters}
-                onClick={(i) => this.handleFilter(i)} />
-            </div>
+        <Row >
+          <Col xl={2} style={{ borderRight: "55px solid rgba(149, 219, 199, 0.5)"}}>
+         
+          <ImageSearch
+                    value={this.state.filters}
+                    onClick={(i) => this.handleFilter(i)} />
+          <IconBar />
+          </Col>
 
-          </div>
-          <div className="right">
-            <div id="container">
-              <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css"
-                integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
-                crossOrigin="" />
-              <Map center={position} zoom={this.state.zoom}>
-                <TileLayer
-                  attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-                  url='https://{s}.tile.osm.org/{z}/{x}/{y}.png'
-                />
-                {Object.keys(this.state.hits).map((index) => (
-                  <ImageMarkers
-                    value={this.state.hits[index]}
-                    location={index} />
-                ))}
-              </Map></div>
-            <h3>Search</h3>
-            <div>
-              <SearchResults
+          { /*Leaflet Map */}
+          <Col sm={12} md={12} lg={10} xl={10} style={{ height: "80vh", padding: "0% 0% 0% 0%", marginTop: "0%", marginBottom: "0%", border: "1px solid green" }} >
+            <div className="map-container" >
+              <div className=" map-frame" >
+                <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css"
+                  integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
+                  crossOrigin="" />
+
+                <Map center={position} zoom={this.state.zoom} style={{ zIndex: "1" }}>
+                  <TileLayer
+                    attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+                    url='https://{s}.tile.osm.org/{z}/{x}/{y}.png'
+                  />
+                  {Object.keys(this.state.hits).map((index) => (
+                    <ImageMarkers
+                      value={this.state.hits[index]}
+                      location={index} />
+                  ))}
+                </Map>
+              </div>
+              { /*End of Leaflet  Map */}
+
+              <h5>Breadcrumb</h5>
+           
+                <SearchResults    
                 value={this.state.hits}
                 group={this.state.aggregation}
-                onClick={(i) => this.handleFilter(i)} />
+                onClick={(i) => this.handleFilter(i)} 
+                />
+           
+                <div id="map-id">
+                </div>
+                <div className="favs">
+                  <h3>Favourites list</h3>
+                  <ul>
+                    {favs}
+                  </ul>
+                </div>
+             
             </div>
-          </div>
-          <div className="favs">
-            <h3>Favourites list</h3>
-            <ul>
-              {favs}
-            </ul>
-          </div>
-        </div>
+          </ Col>
+      
+        </Row>
 
-
-      </div>
+        <Footer />
+      </Fragment>
     );
   }
 }
