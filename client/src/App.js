@@ -1,9 +1,11 @@
 import React, { Fragment } from 'react';
 import './App.css';
 import { CONFIG } from './config.js';
-import { Map, Marker, Popup, Tooltip, TileLayer } from 'react-leaflet';
-import Wkt from 'wicket';
-import wkt_coords from 'wicket';
+import { Map, Marker, Popup, Tooltip, TileLayer} from 'react-leaflet';
+import L from 'leaflet';
+//import  MarkerClusterGroup  from "react-leaflet-markercluster";
+//import Wkt from 'wicket';
+//import wkt_coords from 'wicket';
 import 'bootstrap/dist/css/bootstrap.min.css';
 //import { DateRangePicker } from 'react-date-range';
 /*import 'react-date-range/dist/styles.css'; // main style file
@@ -63,10 +65,15 @@ function ImageSearch(props) {
 function ImageFilterType(props) {
   return (
     <div style={{marginLeft: "4%"}} key="{key}">
-     
-        <Button style={{width: "100%"}} variant="outline-success" onClick={() => props.onClick(props.header + '=')}>
+
+<Accordion>
+  <Card>
+    <Accordion.Toggle as={Card.Header} eventKey="0"  style={{backgroundColor: "#fff", borderRight: "55px solid rgba(149, 219, 199, 0.5)"}} >
+    <Button style={{width: "100%"}} variant="outline" onClick={() => props.onClick(props.header + '=')}>
           {props.header}</Button>
-   
+    </Accordion.Toggle>
+    <Accordion.Collapse eventKey="0">
+      <Card.Body>
       <ul>
         {Object.keys(props.value).map((key1) => (
           <ImageFilter
@@ -75,6 +82,11 @@ function ImageFilterType(props) {
             onClick={() => props.onClick(props.header + '=' + props.value[key1].key)} />
         ))}
       </ul>
+      </Card.Body>
+    </Accordion.Collapse>
+  </Card>
+
+</Accordion>
     </div>
   );
 }
@@ -134,8 +146,9 @@ function ImageMarkers(props) {
         key={props.value.supersite_node_code + index} />
     //)) */
     <ImageMarker
-      value={popup}
-      type={id}
+
+      value={popup} 
+      type={id}  
       site={id}
       position={position}
       id={id}
@@ -145,13 +158,37 @@ function ImageMarkers(props) {
 
 function ImageMarker(props) {
   return (
-    <Marker key={props.id}
-      position={props.position}>
-      <Popup>Popup {props.type} - {props.value}</Popup>
-      <Tooltip>{props.type} - {props.value} Tooltip</Tooltip>
+ 
+    <Marker 
+  
+    icon={L.divIcon({
+      html: ``,
+      className: "custom-marker",
+      iconSize: L.point(30, 30, true)
+    })}
+
+ 
+  
+    key={props.id} 
+      position={props.position}> <br />
+      <Popup>{props.type} <br /> {props.value}</Popup>
+      <Tooltip>{props.type} <br /> {props.value} </Tooltip>
     </Marker>
+   
   );
 }
+
+
+
+
+
+
+
+
+
+
+
+
 
 class App extends React.Component {
 
@@ -170,7 +207,8 @@ class App extends React.Component {
       aggregation: null,
       lat: -27.47,
       lng: 143.02,
-      zoom: 5
+      zoom: 5,
+      maxZoom: 30
     };
   }
 
@@ -257,7 +295,18 @@ class App extends React.Component {
     alert(i);  //image_type=photopoint
   }
 
+  
+
+
+
+
+
+
+
+
   render() {
+  
+
     const { favourites } = this.state;
     const favs = favourites.map((favourite, index) => {
       return (
@@ -278,6 +327,23 @@ class App extends React.Component {
     }
 
 
+
+    
+
+
+
+      
+     
+
+ 
+
+
+
+      
+
+
+
+
     return (
       <Fragment>
 
@@ -285,12 +351,12 @@ class App extends React.Component {
         <SearchBar />
        
         <Row >
-          <Col xl={2} style={{ borderRight: "55px solid rgba(149, 219, 199, 0.5)"}}>
+          <Col xl={2} >
           { /*Filter SideBar*/}
           <ImageSearch
                     value={this.state.filters}
                     onClick={(i) => this.handleFilter(i)} />
-          <IconBar />
+         
           </Col>
 
           { /*Leaflet Map */}
@@ -300,18 +366,40 @@ class App extends React.Component {
                 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css"
                   integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
                   crossOrigin="" />
-
+                 <div id="map-id">
                 <Map center={position} zoom={this.state.zoom} style={{ zIndex: "1" }}>
                   <TileLayer
                     attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
                     url='https://{s}.tile.osm.org/{z}/{x}/{y}.png'
                   />
+
+
+                  
+
+
+
+
+
+
+
+       
+
                   {Object.keys(this.state.hits).map((index) => (
+                
                     <ImageMarkers
                       value={this.state.hits[index]}
-                      location={index} />
+                      location={index}
+                      />
+                    
+
                   ))}
+                  
+
+
+
+
                 </Map>
+                </div>
               </div>
               { /*End of Leaflet  Map */}
 
@@ -324,8 +412,8 @@ class App extends React.Component {
                 onClick={(i) => this.handleFilter(i)} 
                 />
            
-                <div id="map-id">
-                </div>
+               
+              
                 <div className="favs">
                   <h3>Favourites list</h3>
                   <ul>
