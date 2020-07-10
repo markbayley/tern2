@@ -1,5 +1,6 @@
 import React, { Fragment } from 'react';
 import './App.css';
+import './index.css';
 import { CONFIG } from './config.js';
 import { Map, Marker, Popup, Tooltip, TileLayer} from 'react-leaflet';
 import L from 'leaflet';
@@ -69,6 +70,7 @@ function ImageFilterType(props) {
 <Accordion>
   <Card>
     <Accordion.Toggle as={Card.Header} eventKey="0"  style={{backgroundColor: "#fff", borderRight: "55px solid rgba(149, 219, 199, 0.5)"}} >
+    
     <Button style={{width: "100%"}} variant="outline" onClick={() => props.onClick(props.header + '=')}>
           {props.header}</Button>
     </Accordion.Toggle>
@@ -295,6 +297,9 @@ class App extends React.Component {
     alert(i);  //image_type=photopoint
   }
 
+
+  
+
   
 
 
@@ -326,9 +331,8 @@ class App extends React.Component {
       key: 'selection',
     }
 
+ 
 
-
-    
 
 
 
@@ -345,12 +349,12 @@ class App extends React.Component {
 
 
     return (
-      <Fragment>
+      <div  >
 
         <TopBar />
         <SearchBar />
        
-        <Row >
+        <Row className="content"   >
           <Col xl={2} >
           { /*Filter SideBar*/}
           <ImageSearch
@@ -358,6 +362,9 @@ class App extends React.Component {
                     onClick={(i) => this.handleFilter(i)} />
          
           </Col>
+
+          <div data-map-canvas></div>
+         
 
           { /*Leaflet Map */}
           <Col sm={12} md={12} lg={10} xl={10} style={{ height: "80vh", padding: "0% 0% 0% 0%", marginTop: "0%", marginBottom: "0%", border: "1px solid green" }} >
@@ -369,11 +376,21 @@ class App extends React.Component {
                  <div id="map-id">
                 <Map center={position} zoom={this.state.zoom} style={{ zIndex: "1" }}>
                   <TileLayer
-                    attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+                    attribution='&copy; <a href="http://a.tile.openstreetmap.fr/hot/${z}/${x}/${y}.png">OpenStreetMap</a> contributors'
                     url='https://{s}.tile.osm.org/{z}/{x}/{y}.png'
                   />
 
+                 <TileLayer
+                    attribution='&copy; <a href="http://a.tile.openstreetmap.fr/hot/${z}/${x}/${y}.png">OpenStreetMap</a> contributors'
+                    url='https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'
+                  />
 
+                  <TileLayer  
+                    attribution='&copy; <a href="http://a.tile.openstreetmap.fr/hot/${z}/${x}/${y}.png">OpenStreetMap</a> contributors'
+                    url='https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png'
+                  />
+
+             
                   
 
 
@@ -423,11 +440,11 @@ class App extends React.Component {
              
             </div>
           </ Col>
-      
+          
         </Row>
 
         <Footer />
-      </Fragment>
+      </div>
     );
   }
 }
