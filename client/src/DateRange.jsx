@@ -4,7 +4,6 @@ import "react-dates/initialize";
 import { DateRangePicker } from "react-dates";
 import "react-dates/lib/css/_datepicker.css";
 
-
 class DateRange extends React.Component {
   state = {
     startDate: null,
@@ -31,11 +30,18 @@ class DateRange extends React.Component {
 
   render() {
     return (
-      <div >
-        <h6 style={{ paddingBottom: "0%", color: "#065f65", fontWeight: "500" }}>Date Range</h6> 
-      
-        <DateRangePicker  small='true' noBorder="true" startDateAriaLabe="fff" keepOpenOnDateSelect="true" 
-        
+      <div>
+        <h6
+          style={{ paddingBottom: "0%", color: "#065f65", fontWeight: "500" }}
+        >
+          Date Range
+        </h6>
+
+        <DateRangePicker
+          small="true"
+          noBorder="true"
+          startDateAriaLabe="fff"
+          keepOpenOnDateSelect="true"
           startDate={this.state.startDate}
           startDateId="start_date_id"
           endDate={this.state.endDate}
@@ -46,7 +52,7 @@ class DateRange extends React.Component {
           focusedInput={this.state.focusedInput}
           onFocusChange={(focusedInput) => this.setState({ focusedInput })}
         />
-        <hr style={{ border: '0.5px solid #66b3a6', marginTop: "7%" }}></hr>
+        <hr style={{ border: "0.5px solid #66b3a6", marginTop: "7%" }}></hr>
       </div>
     );
   }
