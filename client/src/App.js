@@ -16,7 +16,15 @@ import TopBar from './TopBar'
 import Footer from './Footer';
 import { Accordion, Card, CardTitle, Container, Button, Col, Row, Form} from "react-bootstrap";
 import SearchBar from './SearchBar'
-import IconBar from './IconBar'
+import IconBar from './IconBar';
+
+
+import MarkerClusterGroup from "react-leaflet-markercluster";
+
+
+
+
+
 
 
 const base_image_url = 'https://swift.rc.nectar.org.au/v1/AUTH_05bca33fce34447ba7033b9305947f11/';
@@ -176,6 +184,7 @@ function ImageMarker(props) {
       <Popup>{props.type} <br /> {props.value}</Popup>
       <Tooltip>{props.type} <br /> {props.value} </Tooltip>
     </Marker>
+
    
   );
 }
@@ -210,7 +219,8 @@ class App extends React.Component {
       lat: -27.47,
       lng: 143.02,
       zoom: 5,
-      maxZoom: 30
+      maxZoom: 30,
+      minZoom: 5
     };
   }
 
@@ -310,6 +320,7 @@ class App extends React.Component {
 
 
   render() {
+
   
 
     const { favourites } = this.state;
@@ -355,7 +366,7 @@ class App extends React.Component {
         <SearchBar />
        
         <Row className="content"   >
-          <Col xl={2} >
+          <Col xl={2}  style={{marginRight: "-.7%"}}>
           { /*Filter SideBar*/}
           <ImageSearch
                     value={this.state.filters}
@@ -363,18 +374,18 @@ class App extends React.Component {
          
           </Col>
 
-          <div data-map-canvas></div>
+     
          
 
           { /*Leaflet Map */}
-          <Col sm={12} md={12} lg={10} xl={10} style={{ height: "80vh", padding: "0% 0% 0% 0%", marginTop: "0%", marginBottom: "0%", border: "1px solid green" }} >
+          <Col sm={12} md={12} lg={10} xl={10} style={{ height: "80vh", padding: "0% 0% 0% 0%", marginTop: "0%", marginBottom: "0%"}} >
             <div className="map-container" >
               <div className=" map-frame" >
                 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css"
                   integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
                   crossOrigin="" />
                  <div id="map-id">
-                <Map center={position} zoom={this.state.zoom} style={{ zIndex: "1" }}>
+                <Map className="markercluster-map" center={position} zoom={this.state.zoom} style={{ zIndex: "1" }}>
                   <TileLayer
                     attribution='&copy; <a href="http://a.tile.openstreetmap.fr/hot/${z}/${x}/${y}.png">OpenStreetMap</a> contributors'
                     url='https://{s}.tile.osm.org/{z}/{x}/{y}.png'
@@ -389,6 +400,104 @@ class App extends React.Component {
                     attribution='&copy; <a href="http://a.tile.openstreetmap.fr/hot/${z}/${x}/${y}.png">OpenStreetMap</a> contributors'
                     url='https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png'
                   />
+
+
+                  {/* Example Markers */}
+                  <MarkerClusterGroup  >
+                    <Marker position={[-27.8397, 143.0297]} />
+                    <Marker position={[-28.2297, 143.0122]} />
+                    <Marker position={[-27, 143.0901]} />
+                    <Marker position={[-27.8397, 143.0297]} />
+                    <Marker position={[-28.2297, 142.0122]} />
+                    <Marker position={[-27, 143.0901]} />
+                    <Marker position={[-27.8397, 143.0297]} />
+                    <Marker position={[-28.2297, 143.0122]} />
+                    <Marker position={[-27, 143.0901]} />
+                    <Marker position={[-27.8397, 144.0297]} />
+                    <Marker position={[-28.2297, 143.0122]} />
+                    <Marker position={[-28, 143.0901]} />
+                    <Marker position={[-27.8397, 143.0297]} />
+                    <Marker position={[-28.2297, 143.0122]} />
+                    <Marker position={[-26, 143.0901]} />
+                    <Marker position={[-27.8397, 143.0297]} />
+                    <Marker position={[-28.2297, 140.0122]} />
+                    <Marker position={[-28, 143.0901]} />
+                    <Marker position={[-27.8397, 142.0297]} />
+                    <Marker position={[-28.2297, 143.0122]} />
+                    <Marker position={[-27, 143.0901]} />
+                    <Marker position={[-22.8397, 143.0297]} />
+                    <Marker position={[-26.2297, 143.0122]} />
+                    <Marker position={[-27, 143.0901]} />
+                    <Marker position={[-27.8397, 143.0297]} />
+                    <Marker position={[-28.2297, 143.0122]} />
+                    <Marker position={[-27, 143.0901]} />
+                    <Marker position={[-25.8397, 143.0297]} />
+                    <Marker position={[-28.2297, 140.0122]} />
+                    <Marker position={[-24, 143.0901]} />
+                    <Marker position={[-27.8397, 143.0297]} />
+                    <Marker position={[-28.2297, 143.0122]} />
+                    <Marker position={[-24, 143.0901]} />
+                    <Marker position={[-27.8397, 141.0297]} />
+                    <Marker position={[-25.2297, 143.0122]} />
+                    <Marker position={[-27, 143.0901]} />
+                  </MarkerClusterGroup>
+
+                  <MarkerClusterGroup>
+                    <Marker position={[-29.8397, 140.0297]} />
+                    <Marker position={[-28.2297, 142.0122]} />
+                    <Marker position={[-29, 141.0901]} />
+                    <Marker position={[-27.8397, 141.0297]} />
+                    <Marker position={[-29.2297, 140.0122]} />
+                    <Marker position={[-26, 141.0901]} />
+                    <Marker position={[-30.8397, 142.0297]} />
+                    <Marker position={[-29.2297, 140.0122]} />
+                    <Marker position={[-28, 141.0901]} />
+                    <Marker position={[-29.8397, 141.0297]} />
+                    <Marker position={[-29.2297, 140.0122]} />
+                    <Marker position={[-28, 141.0901]} />
+                    <Marker position={[-29.8397, 139.0297]} />
+                    <Marker position={[-29.2297, 142.0122]} />
+                    <Marker position={[-27, 141.0901]} />
+                    <Marker position={[-29.8397, 140.0297]} />
+                    <Marker position={[-26.2297, 141.0122]} />
+                    <Marker position={[-25, 141.0901]} />
+
+                  </MarkerClusterGroup>
+
+                  <MarkerClusterGroup>
+                    <Marker position={[-20.8397, 140.0297]} />
+                    <Marker position={[-27.2297, 140.0122]} />
+                    <Marker position={[-28, 141.0901]} />
+                    <Marker position={[-26.8397, 140.0297]} />
+                    <Marker position={[-27.2297, 135.0122]} />
+                    <Marker position={[-26, 131.0901]} />
+                    <Marker position={[-20.8397, 140.0297]} />
+                    <Marker position={[-27.2297, 140.0122]} />
+                    <Marker position={[-28, 141.0901]} />
+                    <Marker position={[-26.8397, 140.0297]} />
+                    <Marker position={[-27.2297, 135.0122]} />
+                    <Marker position={[-26, 131.0901]} />
+                    <Marker position={[-20.8397, 140.0297]} />
+                    <Marker position={[-27.2297, 140.0122]} />
+                    <Marker position={[-28, 141.0901]} />
+                    <Marker position={[-26.8397, 140.0297]} />
+                    <Marker position={[-27.2297, 135.0122]} />
+                    <Marker position={[-26, 131.0901]} />
+                    <Marker position={[-20.8397, 140.0297]} />
+                    <Marker position={[-27.2297, 140.0122]} />
+                    <Marker position={[-28, 141.0901]} />
+                    <Marker position={[-26.8397, 140.0297]} />
+                    <Marker position={[-27.2297, 135.0122]} />
+                    <Marker position={[-26, 131.0901]} />
+                    <Marker position={[-20.8397, 140.0297]} />
+                    <Marker position={[-27.2297, 140.0122]} />
+                    <Marker position={[-28, 141.0901]} />
+                    <Marker position={[-26.8397, 140.0297]} />
+                    <Marker position={[-27.2297, 135.0122]} />
+                    <Marker position={[-26, 131.0901]} />
+                  </MarkerClusterGroup>
+
+
 
              
                   
@@ -407,6 +516,7 @@ class App extends React.Component {
                       value={this.state.hits[index]}
                       location={index}
                       />
+                     
                     
 
                   ))}
@@ -429,10 +539,11 @@ class App extends React.Component {
                 onClick={(i) => this.handleFilter(i)} 
                 />
            
-               
+        
               
                 <div className="favs">
                   <h3>Favourites list</h3>
+               
                   <ul>
                     {favs}
                   </ul>
