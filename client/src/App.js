@@ -12,20 +12,13 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 /*import 'react-date-range/dist/styles.css'; // main style file
 import 'react-date-range/dist/theme/default.css'; // theme css file*/
 import TopBar from './TopBar'
-
 import Footer from './Footer';
 import { Accordion, Card, CardTitle, Container, Button, Col, Row, Form} from "react-bootstrap";
 import SearchBar from './SearchBar'
 import IconBar from './IconBar';
-
-
 import MarkerClusterGroup from "react-leaflet-markercluster";
-
-
-
-
-
-
+import Scroll from './Scroll';
+import DateRange from './DateRange'
 
 const base_image_url = 'https://swift.rc.nectar.org.au/v1/AUTH_05bca33fce34447ba7033b9305947f11/';
 
@@ -50,12 +43,23 @@ function SearchResult(props) {
     <Col xl={3} >
     <Card id={props.id} style={{marginTop: "5%"}}>
       <img src={img_url} style={{height: "210px"}}/>
-      <span className="center" ><Button variant="outline-secondary" style={{width: "100%"}} onClick={() => props.onClick(props.id)}>  <strong>Site:</strong> { props.value.site_id.value}  <strong>Image Type:</strong> { props.value.image_type.value} <br /> <strong>Image Count:</strong> { props.value.doc_count}  </Button></span>
+      <Form className="center" style={{ paddingTop: "5px" }}>
+                  {['radio'].map((type) => (
+                    <div key={`inline-${type}`} className="mb-3">
+                      <Form.Check type={type} id={`inline-${type}-1`} inline label="View" />
+                      <Form.Check inline label="Select" type={type} id={`inline-${type}-2`} />
+                      <Form.Check inline label="Download" type={type} id={`inline-${type}-3`} />
+                    </div>
+                  ))}
+                </Form>
+      <span className="center" ><Button variant="outline-info" style={{width: "100%"}} onClick={() => props.onClick(props.id)}>  <strong>Site:</strong> { props.value.site_id.value}  <strong>Image Type:</strong> { props.value.image_type.value} <br /> <strong>Image Count:</strong> { props.value.doc_count}  </Button></span>
+
+   
+   
     </Card>
     </Col>
   );
 }
-
 
 function ImageSearch(props) {
   return (
@@ -95,7 +99,6 @@ function ImageFilterType(props) {
       </Card.Body>
     </Accordion.Collapse>
   </Card>
-
 </Accordion>
     </div>
   );
@@ -156,7 +159,6 @@ function ImageMarkers(props) {
         key={props.value.supersite_node_code + index} />
     //)) */
     <ImageMarker
-
       value={popup} 
       type={id}  
       site={id}
@@ -170,35 +172,19 @@ function ImageMarker(props) {
   return (
  
     <Marker 
-  
     icon={L.divIcon({
       html: ``,
       className: "custom-marker",
-      iconSize: L.point(30, 30, true)
+      iconSize: L.point(33, 33, true)
     })}
 
- 
-  
     key={props.id} 
       position={props.position}> <br />
-      <Popup>{props.type} <br /> {props.value}</Popup>
+      <Popup><strong>{props.type}</strong> <br /> {props.value}</Popup>
       <Tooltip>{props.type} <br /> {props.value} </Tooltip>
     </Marker>
-
-   
   );
 }
-
-
-
-
-
-
-
-
-
-
-
 
 
 class App extends React.Component {
@@ -308,21 +294,8 @@ class App extends React.Component {
   }
 
 
-  
-
-  
-
-
-
-
-
-
-
 
   render() {
-
-  
-
     const { favourites } = this.state;
     const favs = favourites.map((favourite, index) => {
       return (
@@ -343,40 +316,23 @@ class App extends React.Component {
     }
 
  
-
-
-
-
-      
-     
-
- 
-
-
-
-      
-
-
-
-
     return (
       <div  >
 
         <TopBar />
         <SearchBar />
-       
+       <IconBar />
+     
         <Row className="content"   >
-          <Col xl={2}  style={{marginRight: "-.7%"}}>
+          <Col xl={2}  style={{marginRight: "-.7%", zIndex: "9"}}>
           { /*Filter SideBar*/}
           <ImageSearch
                     value={this.state.filters}
                     onClick={(i) => this.handleFilter(i)} />
-         
+
+<DateRange />
           </Col>
-
-     
-         
-
+        
           { /*Leaflet Map */}
           <Col sm={12} md={12} lg={10} xl={10} style={{ height: "80vh", padding: "0% 0% 0% 0%", marginTop: "0%", marginBottom: "0%"}} >
             <div className="map-container" >
@@ -400,7 +356,6 @@ class App extends React.Component {
                     attribution='&copy; <a href="http://a.tile.openstreetmap.fr/hot/${z}/${x}/${y}.png">OpenStreetMap</a> contributors'
                     url='https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png'
                   />
-
 
                   {/* Example Markers */}
                   <MarkerClusterGroup  >
@@ -461,7 +416,6 @@ class App extends React.Component {
                     <Marker position={[-29.8397, 140.0297]} />
                     <Marker position={[-26.2297, 141.0122]} />
                     <Marker position={[-25, 141.0901]} />
-
                   </MarkerClusterGroup>
 
                   <MarkerClusterGroup>
@@ -496,35 +450,16 @@ class App extends React.Component {
                     <Marker position={[-27.2297, 135.0122]} />
                     <Marker position={[-26, 131.0901]} />
                   </MarkerClusterGroup>
-
-
-
-             
-                  
-
-
-
-
-
-
-
-       
-
+         
+                  {/* API Markers */}
                   {Object.keys(this.state.hits).map((index) => (
                 
                     <ImageMarkers
                       value={this.state.hits[index]}
                       location={index}
                       />
-                     
-                    
-
                   ))}
                   
-
-
-
-
                 </Map>
                 </div>
               </div>
@@ -538,9 +473,7 @@ class App extends React.Component {
                 group={this.state.aggregation}
                 onClick={(i) => this.handleFilter(i)} 
                 />
-           
-        
-              
+            
                 <div className="favs">
                   <h3>Favourites list</h3>
                
@@ -553,7 +486,7 @@ class App extends React.Component {
           </ Col>
           
         </Row>
-
+        <Scroll />
         <Footer />
       </div>
     );

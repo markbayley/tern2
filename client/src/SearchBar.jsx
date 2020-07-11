@@ -106,7 +106,7 @@ function SearchBar() {
                     onChange={handleChange}
                     id="place"
                     type="text"
-                    placeholder="Search images by region or site"
+                    placeholder="Search images by region or by site"
                     style={{ fontSize: "20px", color: "#00565D", marginTop: "17px"}}
                     aria-label="term"
                   />

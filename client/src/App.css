@@ -955,7 +955,7 @@ a {
 	background: #065f65;
 
 	border-radius: 50%;
-	border: 3px solid rgba(149, 219, 199);
+	border: 5px solid rgba(84, 179, 166, 0.9);
   }
   .leaflet-popup-content-wrapper, .leaflet-popup-tip {
 	  background: #826fa9;
@@ -973,6 +973,38 @@ a {
 
 
   .markercluster-map { height: 80vh; }
+
+
+
+
+
+  .scroll {
+	opacity: 0.7;
+	
+	width: 40px;
+	height: 40px;
+	position: fixed;
+	bottom: 10px;
+	right: 10px;
+	border-radius: 50px;
+	border: 3px solid #065f65;
+	z-index: 10;
+	
+	
+
+	background-image: url(/img/chevron.png);
+	background-repeat: no-repeat;
+
+	 -webkit-background-size: 34px auto;
+	
+
+  }
+
+  .scroll:hover {
+	opacity: 1;
+  }
+  
+
 
 
 
