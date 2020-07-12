@@ -3,7 +3,7 @@ import { Nav, Row } from "react-bootstrap";
 
 function Footer() {
   return (
-    <div className="footer">
+    <div className="footer" >
       <Row
         className="justify-content-center"
         activekey="/home"

@@ -30,6 +30,8 @@ import IconBar from "./IconBar";
 import MarkerClusterGroup from "react-leaflet-markercluster";
 import Scroll from "./Scroll";
 import DateRange from "./DateRange";
+import Legend from "./Legend";
+
 
 const base_image_url =
   "https://swift.rc.nectar.org.au/v1/AUTH_05bca33fce34447ba7033b9305947f11/";
@@ -120,7 +122,7 @@ function SearchResult(props) {
         </Form>
         <span className="center">
           <Button
-            variant="outline-info"
+            variant="outline-secondary"
             style={{ width: "100%" }}
             onClick={() => props.onClick(props.id)}
           >
@@ -161,6 +163,7 @@ function ImageFilterType(props) {
             style={{
               backgroundColor: "#fff",
               borderRight: "55px solid rgba(149, 219, 199, 0.5)",
+       
             }}
           >
             <Button
@@ -168,8 +171,9 @@ function ImageFilterType(props) {
               variant="outline"
               onClick={() => props.onClick(props.header + "=")}
             >
-              {props.header}
+              {props.header} <img src="/img/quickview.svg" width="40px" align="right"/>
             </Button>
+            
           </Accordion.Toggle>
           <Accordion.Collapse eventKey="0">
             <Card.Body>
@@ -188,6 +192,7 @@ function ImageFilterType(props) {
           </Accordion.Collapse>
         </Card>
       </Accordion>
+      <hr style={{ border: "0.5px solid #66b3a6", marginTop: "0%", marginBottom: "0.5%" }}></hr>
     </div>
   );
 }
@@ -272,15 +277,20 @@ function ImageMarkers(props) {
 }
 
 function ImageMarker(props) {
+  
   return (
-    <Marker
+    <Marker 
       icon={L.divIcon({
-        html: ``,
+        html:  '<div>' + props.value[10] + props.value[11]+ '</div>',
         className: "custom-marker",
         iconSize: L.point(33, 33, true),
+       
+      
       })}
       key={props.id}
       position={props.position}
+     
+ 
     >
       {" "}
       <br />
@@ -289,7 +299,9 @@ function ImageMarker(props) {
       </Popup>
       <Tooltip>
         {props.type} <br /> {props.value}{" "}
+        <img src="/img/photopoint.svg" width="30px" />
       </Tooltip>
+      
     </Marker>
   );
 }
@@ -308,8 +320,8 @@ class App extends React.Component {
       search: {},
       selectedFilter: {},
       aggregation: null,
-      lat: -27.47,
-      lng: 143.02,
+      lat: -26.47,
+      lng: 134.02,
       zoom: 5,
       maxZoom: 30,
       minZoom: 5,
@@ -424,9 +436,10 @@ class App extends React.Component {
         <SearchBar />
         <IconBar />
 
-        <Row className="content">
+        <Row >
           <Col xl={2} style={{ marginRight: "-.7%", zIndex: "9" }}>
             {/*Filter SideBar*/}
+           <h5 style={{marginLeft: "15px", marginTop: "20px"}}>Filter</h5> 
             <ImageSearch
               value={this.state.filters}
               onClick={(i) => this.handleFilter(i)}
@@ -572,6 +585,8 @@ class App extends React.Component {
                       <Marker position={[-26, 131.0901]} />
                     </MarkerClusterGroup>
 
+         
+                   
                     {/* API Markers */}
                     {Object.keys(this.state.hits).map((index) => (
                       <ImageMarkers
@@ -602,6 +617,7 @@ class App extends React.Component {
           </Col>
         </Row>
         <Scroll />
+       <Legend />
         <Footer />
       </div>
     );

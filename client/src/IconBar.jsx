@@ -17,13 +17,13 @@ function IconBar() {
       </Row>
 
       <Row
-        style={{ position: "absolute", left: "13.7%", top: "31%", zIndex: 10 }}
+        style={{ position: "absolute", left: "13.7%", top: "53%", zIndex: 10 }}
       >
         <img src="img/icons/calendar.svg" alt="location" height="40px" />
       </Row>
 
       <Row
-        style={{ position: "absolute", left: "13.7%", top: "44%", zIndex: 10 }}
+        style={{ position: "absolute", left: "13.7%", top: "46%", zIndex: 10 }}
       >
         <img src="img/icons/frequency.svg" alt="location" height="40px" />
       </Row>
