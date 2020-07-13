@@ -31,7 +31,8 @@ import MarkerClusterGroup from "react-leaflet-markercluster";
 import Scroll from "./Scroll";
 import DateRange from "./DateRange";
 import Legend from "./Legend";
-
+import FetchRandomUser from "./FetchRandomUser";
+import Query from "./Query";
 
 const base_image_url =
   "https://swift.rc.nectar.org.au/v1/AUTH_05bca33fce34447ba7033b9305947f11/";
@@ -63,9 +64,9 @@ function SearchResult(props) {
         <Modal.Header closeButton>
           <Modal.Title>
             {" "}
-            Site: {props.value.site_id.value} <br /> Image Type:{" "}
-            {props.value.image_type.value} <br /> Image Count:{" "}
-            {props.value.doc_count}
+            Site: {props.value.site_id.label} <br />
+            Image Type: {props.value.image_type.value} <br />
+            Image Count: {props.value.doc_count}
           </Modal.Title>
         </Modal.Header>
         <Modal.Body>
@@ -127,8 +128,8 @@ function SearchResult(props) {
             onClick={() => props.onClick(props.id)}
           >
             {" "}
-            <strong>Site:</strong> {props.value.site_id.value}{" "}
-            <strong>Image Type:</strong> {props.value.image_type.value} <br />{" "}
+            <strong>Site:</strong> {props.value.site_id.label} <br />
+            <strong>Image Type:</strong> {props.value.image_type.value}{" "}
             <strong>Image Count:</strong> {props.value.doc_count}{" "}
           </Button>
         </span>
@@ -153,8 +154,30 @@ function ImageSearch(props) {
 }
 
 function ImageFilterType(props) {
+  const icons = [
+    {
+      id: 1,
+      icon: <img src="/img/LAI.svg" />,
+    },
+    {
+      id: 2,
+      icon: <img src="/img/LAI.svg" />,
+    },
+    {
+      id: 3,
+      icon: <img src="/img/LAI.svg" />,
+    },
+    {
+      id: 4,
+      icon: <img src="/img/LAI.svg" />,
+    },
+  ];
+
   return (
     <div style={{ marginLeft: "4%" }} key="{key}">
+      <h6 style={{ paddingBottom: "0%", color: "#065f65", fontWeight: "500" }}>
+        {props.header}
+      </h6>
       <Accordion>
         <Card>
           <Accordion.Toggle
@@ -163,7 +186,6 @@ function ImageFilterType(props) {
             style={{
               backgroundColor: "#fff",
               borderRight: "55px solid rgba(149, 219, 199, 0.5)",
-       
             }}
           >
             <Button
@@ -171,9 +193,9 @@ function ImageFilterType(props) {
               variant="outline"
               onClick={() => props.onClick(props.header + "=")}
             >
-              {props.header} <img src="/img/quickview.svg" width="40px" align="right"/>
+              {props.header}{" "}
+              <img src="/img/quickview.svg" width="40px" align="right" />
             </Button>
-            
           </Accordion.Toggle>
           <Accordion.Collapse eventKey="0">
             <Card.Body>
@@ -192,7 +214,13 @@ function ImageFilterType(props) {
           </Accordion.Collapse>
         </Card>
       </Accordion>
-      <hr style={{ border: "0.5px solid #66b3a6", marginTop: "0%", marginBottom: "0.5%" }}></hr>
+      <hr
+        style={{
+          border: "0.5px solid #66b3a6",
+          marginTop: "0%",
+          marginBottom: "0.5%",
+        }}
+      ></hr>
     </div>
   );
 }
@@ -272,36 +300,40 @@ function ImageMarkers(props) {
       position={position}
       id={id}
       key={id}
+      label={id}
     />
   );
 }
 
 function ImageMarker(props) {
-  
   return (
-    <Marker 
+    <Marker
       icon={L.divIcon({
-        html:  '<div>' + props.value[10] + props.value[11]+ '</div>',
+        html: "<div>" + props.value[10] + props.value[11] + "</div>",
         className: "custom-marker",
         iconSize: L.point(33, 33, true),
-       
-      
       })}
       key={props.id}
       position={props.position}
-     
- 
     >
       {" "}
       <br />
       <Popup>
-        <strong>{props.type}</strong> <br /> {props.value}
+        <strong>Site:</strong> {props.type} <br />
+        <strong>Image Types:</strong> {props.value} <br />{" "}
+        <img src="/img/LAI.svg" width="30px" />
+        <img src="/img/Panoramic.svg" width="30px" />
+        <img src="/img/phenocam.svg" width="30px" />
+        <img src="/img/photopoint.svg" width="30px" />
       </Popup>
       <Tooltip>
-        {props.type} <br /> {props.value}{" "}
+        <strong>Site: {props.type} </strong> <br />
+        Image Types: {props.value} <br />{" "}
+        <img src="/img/LAI.svg" width="30px" />
+        <img src="/img/Panoramic.svg" width="30px" />
+        <img src="/img/phenocam.svg" width="30px" />
         <img src="/img/photopoint.svg" width="30px" />
       </Tooltip>
-      
     </Marker>
   );
 }
@@ -436,16 +468,27 @@ class App extends React.Component {
         <SearchBar />
         <IconBar />
 
-        <Row >
-          <Col xl={2} style={{ marginRight: "-.7%", zIndex: "9" }}>
+        <Row>
+          <Col
+            xl={2}
+            style={{ marginRight: "-.7%", zIndex: "9", height: "200vh" }}
+          >
             {/*Filter SideBar*/}
-           <h5 style={{marginLeft: "15px", marginTop: "20px"}}>Filter</h5> 
+            <h5 style={{ marginLeft: "15px", marginTop: "20px" }}>Filter</h5>
             <ImageSearch
               value={this.state.filters}
               onClick={(i) => this.handleFilter(i)}
             />
 
             <DateRange />
+            <Query />
+
+            <div className="favs">
+              <h5 style={{ marginLeft: "15px", marginTop: "20px" }}>
+                Favourites list
+              </h5>
+              <ul>{favs}</ul>
+            </div>
           </Col>
 
           {/*Leaflet Map */}
@@ -585,8 +628,6 @@ class App extends React.Component {
                       <Marker position={[-26, 131.0901]} />
                     </MarkerClusterGroup>
 
-         
-                   
                     {/* API Markers */}
                     {Object.keys(this.state.hits).map((index) => (
                       <ImageMarkers
@@ -607,17 +648,11 @@ class App extends React.Component {
                 group={this.state.aggregation}
                 onClick={(i) => this.handleFilter(i)}
               />
-
-              <div className="favs">
-                <h3>Favourites list</h3>
-
-                <ul>{favs}</ul>
-              </div>
             </div>
           </Col>
         </Row>
         <Scroll />
-       <Legend />
+        <Legend />
         <Footer />
       </div>
     );

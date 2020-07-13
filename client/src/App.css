@@ -923,12 +923,12 @@ a {
 .index {
   opacity: 1;
   background-color: "white";
-  width: 145px;
-  height: 70px;
+  width: 200px;
+  height: 150px;
   position: absolute;
   padding: 10px;
-  top: 860px;
-  right: 1430px;
+  top: 790px;
+  right: 1400px;
   border-radius: 1px;
   border: 1px solid #065f65;
   z-index: 5;
