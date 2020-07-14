@@ -164,17 +164,38 @@ a {
   display: "flex";
   justify-content: "center";
   background-image: url(/img/icons/search-bar2.png);
-
+ 
   width: 50%;
   height: 100%;
   background-repeat: no-repeat;
 }
 
+.searchbar:hover {
+  background-image: url(/images/search-bar2-dark.png);
+  transition: background 5s;
+
+}
+
+
+
 .searchbutton {
   background-image: url(/img/icons/search-arrow.svg);
   background-repeat: no-repeat;
-  width: 150%;
+  
+  
+
 }
+
+.searchbutton:hover {
+  background-image: url(/img/icons/search-arrow-light.svg);
+  background-repeat: no-repeat;
+  background-color: #065f65;
+  transition: background 1s;
+ 
+  
+ 
+}
+
 
 .searchicon {
   background-image: url(/img/icons/search-bioimages-icon.svg);
@@ -194,6 +215,12 @@ a {
   color: #065f65;
   opacity: 1;
 }
+
+#place:hover {
+  color: #fff;
+  opacity: 1;
+}
+
 
 /* TOP HEADER INDEX */
 
@@ -840,7 +867,8 @@ a {
   width: 100%;
   margin: 0%;
 
-  margin-top: -13px;
+
+
 }
 
 .selectbtn {
@@ -898,7 +926,7 @@ a {
 }
 
 .scroll {
-  opacity: 0.9;
+  
 
   width: 40px;
   height: 40px;
@@ -916,7 +944,12 @@ a {
 }
 
 .scroll:hover {
-  opacity: 1;
+  background-color:  #065f65;
+  transition: background 0.5s;
+  background-image: url(/img/chevronlight.png);
+  background-repeat: no-repeat;
+  border: 2px solid #fff;
+ 
 }
 
 
@@ -932,6 +965,7 @@ a {
   border-radius: 1px;
   border: 1px solid #065f65;
   z-index: 5;
+  opacity: .8;
 }
 
 

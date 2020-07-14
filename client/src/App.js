@@ -33,10 +33,14 @@ import DateRange from "./DateRange";
 import Legend from "./Legend";
 import FetchRandomUser from "./FetchRandomUser";
 import Query from "./Query";
+import BreadCrumb from './BreadCrumb';
 
 const base_image_url =
   "https://swift.rc.nectar.org.au/v1/AUTH_05bca33fce34447ba7033b9305947f11/";
 
+{
+  /*Photo Gallery*/
+}
 function SearchResults(props) {
   return (
     <Row>
@@ -52,6 +56,9 @@ function SearchResults(props) {
   );
 }
 
+{
+  /*Photo Gallery Item*/
+}
 function SearchResult(props) {
   const img_url = props.value.thumbnail_url;
 
@@ -97,7 +104,10 @@ function SearchResult(props) {
 
       <Card id={props.id} style={{ marginTop: "5%" }}>
         <Image onClick={handleShow} src={img_url} style={{ height: "210px" }} />
-        <Form className="center" style={{ paddingTop: "5px" }}>
+        <Form
+          className="center"
+          style={{ paddingTop: "5px", color: "#065f65" }}
+        >
           {["radio"].map((type) => (
             <div key={`inline-${type}`} className="mb-3">
               <Form.Check
@@ -129,7 +139,9 @@ function SearchResult(props) {
           >
             {" "}
             <strong>Site:</strong> {props.value.site_id.label} <br />
-            <strong>Image Type:</strong> {props.value.image_type.value}{" "}
+            <strong>Image Type:</strong>{" "}
+            {props.value.image_type.value[0].toUpperCase() +
+              props.value.image_type.value.substr(1)}{" "}
             <strong>Image Count:</strong> {props.value.doc_count}{" "}
           </Button>
         </span>
@@ -138,6 +150,9 @@ function SearchResult(props) {
   );
 }
 
+{
+  /*Filter SideBar*/
+}
 function ImageSearch(props) {
   return (
     <div>
@@ -153,6 +168,9 @@ function ImageSearch(props) {
   );
 }
 
+{
+  /*Filter SideBar Toggle*/
+}
 function ImageFilterType(props) {
   const icons = [
     {
@@ -175,9 +193,6 @@ function ImageFilterType(props) {
 
   return (
     <div style={{ marginLeft: "4%" }} key="{key}">
-      <h6 style={{ paddingBottom: "0%", color: "#065f65", fontWeight: "500" }}>
-        {props.header}
-      </h6>
       <Accordion>
         <Card>
           <Accordion.Toggle
@@ -189,12 +204,20 @@ function ImageFilterType(props) {
             }}
           >
             <Button
-              style={{ width: "100%" }}
+              style={{
+                width: "105%",
+                textTransform: "capitalize",
+                color: "#065f65",
+                fontWeight: "500",
+              }}
               variant="outline"
               onClick={() => props.onClick(props.header + "=")}
             >
-              {props.header}{" "}
-              <img src="/img/quickview.svg" width="40px" align="right" />
+              {props.header
+                .replace("_", " ")
+                .replace("_", " ")
+                .replace("d", "D")}{" "}
+              <img src="/img/quickview.svg" width="40px" />
             </Button>
           </Accordion.Toggle>
           <Accordion.Collapse eventKey="0">
@@ -225,6 +248,9 @@ function ImageFilterType(props) {
   );
 }
 
+{
+  /*Filter SideBar Item*/
+}
 function ImageFilter(props) {
   return (
     <div>
@@ -319,20 +345,42 @@ function ImageMarker(props) {
       {" "}
       <br />
       <Popup>
-        <strong>Site:</strong> {props.type} <br />
-        <strong>Image Types:</strong> {props.value} <br />{" "}
-        <img src="/img/LAI.svg" width="30px" />
-        <img src="/img/Panoramic.svg" width="30px" />
-        <img src="/img/phenocam.svg" width="30px" />
-        <img src="/img/photopoint.svg" width="30px" />
+        <strong>
+          Site:{" "}
+          <a style={{ textTransform: "capitalize", color: "#065f65" }}>
+            {props.type}{" "}
+          </a>
+        </strong>
+        <br />
+        <strong>
+          Image Types:{" "}
+          <a style={{ textTransform: "capitalize", color: "#065f65" }}>
+            {props.value}
+          </a>{" "}
+        </strong>{" "}
+        <br /> <img src="/img/LAI.svg" width="25px" margin-right="5px" />
+        <img src="/img/Panoramic.svg" width="25px" margin-right="10px" />
+        <img src="/img/phenocam.svg" width="25px" margn-right="5px" />
+        <img src="/img/photopoint.svg" width="25px" margin-right="5px" />
       </Popup>
       <Tooltip>
-        <strong>Site: {props.type} </strong> <br />
-        Image Types: {props.value} <br />{" "}
-        <img src="/img/LAI.svg" width="30px" />
-        <img src="/img/Panoramic.svg" width="30px" />
-        <img src="/img/phenocam.svg" width="30px" />
-        <img src="/img/photopoint.svg" width="30px" />
+        <strong>
+          Site:{" "}
+          <a style={{ textTransform: "capitalize", color: "#065f65" }}>
+            {props.type}{" "}
+          </a>
+        </strong>
+        <br />
+        <strong>
+          Image Types:{" "}
+          <a style={{ textTransform: "capitalize", color: "#065f65" }}>
+            {props.value}
+          </a>{" "}
+        </strong>{" "}
+        <br /> <img src="/img/LAI.svg" width="25px" margin-right="5px" />
+        <img src="/img/Panoramic.svg" width="25px" margin-right="10px" />
+        <img src="/img/phenocam.svg" width="25px" margn-right="5px" />
+        <img src="/img/photopoint.svg" width="25px" margin-right="5px" />
       </Tooltip>
     </Marker>
   );
@@ -469,12 +517,20 @@ class App extends React.Component {
         <IconBar />
 
         <Row>
+          {/*Filter SideBar*/}
           <Col
             xl={2}
             style={{ marginRight: "-.7%", zIndex: "9", height: "200vh" }}
-          >
-            {/*Filter SideBar*/}
-            <h5 style={{ marginLeft: "15px", marginTop: "20px" }}>Filter</h5>
+          > 
+            <h5
+              style={{
+                marginLeft: "15px",
+                marginTop: "20px",
+                color: "#065f65",
+              }}
+            >
+              Filter
+            </h5>
             <ImageSearch
               value={this.state.filters}
               onClick={(i) => this.handleFilter(i)}
@@ -484,8 +540,14 @@ class App extends React.Component {
             <Query />
 
             <div className="favs">
-              <h5 style={{ marginLeft: "15px", marginTop: "20px" }}>
-                Favourites list
+              <h5
+                style={{
+                  marginLeft: "15px",
+                  marginTop: "20px",
+                  color: "#065f65",
+                }}
+              >
+                Favourites
               </h5>
               <ul>{favs}</ul>
             </div>
@@ -556,22 +618,6 @@ class App extends React.Component {
                       <Marker position={[-28, 143.0901]} />
                       <Marker position={[-27.8397, 142.0297]} />
                       <Marker position={[-28.2297, 143.0122]} />
-                      <Marker position={[-27, 143.0901]} />
-                      <Marker position={[-22.8397, 143.0297]} />
-                      <Marker position={[-26.2297, 143.0122]} />
-                      <Marker position={[-27, 143.0901]} />
-                      <Marker position={[-27.8397, 143.0297]} />
-                      <Marker position={[-28.2297, 143.0122]} />
-                      <Marker position={[-27, 143.0901]} />
-                      <Marker position={[-25.8397, 143.0297]} />
-                      <Marker position={[-28.2297, 140.0122]} />
-                      <Marker position={[-24, 143.0901]} />
-                      <Marker position={[-27.8397, 143.0297]} />
-                      <Marker position={[-28.2297, 143.0122]} />
-                      <Marker position={[-24, 143.0901]} />
-                      <Marker position={[-27.8397, 141.0297]} />
-                      <Marker position={[-25.2297, 143.0122]} />
-                      <Marker position={[-27, 143.0901]} />
                     </MarkerClusterGroup>
 
                     <MarkerClusterGroup>
@@ -618,14 +664,6 @@ class App extends React.Component {
                       <Marker position={[-27.2297, 140.0122]} />
                       <Marker position={[-28, 141.0901]} />
                       <Marker position={[-26.8397, 140.0297]} />
-                      <Marker position={[-27.2297, 135.0122]} />
-                      <Marker position={[-26, 131.0901]} />
-                      <Marker position={[-20.8397, 140.0297]} />
-                      <Marker position={[-27.2297, 140.0122]} />
-                      <Marker position={[-28, 141.0901]} />
-                      <Marker position={[-26.8397, 140.0297]} />
-                      <Marker position={[-27.2297, 135.0122]} />
-                      <Marker position={[-26, 131.0901]} />
                     </MarkerClusterGroup>
 
                     {/* API Markers */}
@@ -639,8 +677,8 @@ class App extends React.Component {
                 </div>
               </div>
               {/*End of Leaflet  Map */}
-
-              <h5>Breadcrumb</h5>
+              <BreadCrumb />
+           
 
               {/*Photo Gallery */}
               <SearchResults

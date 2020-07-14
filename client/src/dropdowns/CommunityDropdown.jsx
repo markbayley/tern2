@@ -42,7 +42,7 @@ export default class CommunityDropdown extends React.Component {
         toggle={this.toggle}
       >
         <DropdownToggle caret tag="span">
-          Community
+          Contact
         </DropdownToggle>
         <DropdownMenu>
           <DropdownItem>Menu Item</DropdownItem>

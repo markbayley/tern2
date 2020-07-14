@@ -71,7 +71,7 @@ function SearchBar() {
         >
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
           <Navbar.Collapse id="basic-navbar-nav">
-            <Col sm={2} style={{ position: "absolute", left: "0%" }}>
+            <Col sm={2} style={{ position: "absolute", left: "0%"}}>
               <Navbar.Brand>
                 <div className="site-branding">
                   <Link to="/">
@@ -85,12 +85,14 @@ function SearchBar() {
               <Col
                 style={{
                   height: "100px",
+                 
+                 
                 }}
               >
                 <h3
                   style={{
                     position: "absolute",
-                    right: "80%",
+                    right: "83%",
                     top: "30%",
                     color: "#065f65",
                   }}
@@ -102,6 +104,7 @@ function SearchBar() {
                       marginBottom: "3%",
                       height: "35px",
                       marginTop: "0%",
+                      
                     }}
                   />
                   Bioimages
@@ -112,13 +115,13 @@ function SearchBar() {
                   inline="true"
                   className="searchbar"
                   style={{
-                    height: "60px",
+                    height: "65px",
                     width: "455px",
                     paddingLeft: "2%",
 
                     position: "absolute",
-                    right: "15%",
-                    top: "20%",
+                    right: "28%",
+                    top: "19%",
                   }}
                 >
                   <Image
@@ -128,6 +131,7 @@ function SearchBar() {
                     style={{
                       width: "8%",
                       paddingTop: "2%",
+
                     }}
                   />
                   <FormControl
@@ -152,6 +156,8 @@ function SearchBar() {
                       width: "33px",
                       marginTop: "3.7%",
                       marginRight: "20px",
+                     borderRadius: "50px",
+
                     }}
                   ></Button>
                 </InputGroup>
@@ -159,12 +165,22 @@ function SearchBar() {
               </Col>
 
               {/*Login Buttons */}
-              <Link to="/login" style={{ marginRight: ".5%" }}>
+              <Link to="/login" 
+              style={{ 
+                  
+                    position: "absolute",
+                    right: "24%",
+                    top: "33%"}}>
                 {" "}
                 <LoginButton />{" "}
               </Link>
 
-              <Link to="/login" style={{ marginRight: ".5%" }}>
+              <Link to="/login" 
+              style={{ 
+               
+                position: "absolute",
+                right: "19%",
+                top: "33%" }}>
                 {" "}
                 <RegisterButton />{" "}
               </Link>
